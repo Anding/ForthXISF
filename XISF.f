@@ -9,15 +9,16 @@ BEGIN-STRUCTURE XISF_BUFFER
 	XISFDataMaxLen		+FIELD XISF_DATA 			\ data with trailing zeros
 END-STRUCTURE
 
+variable XISFBufferPointer
 variable XISFHeaderPointer
 	
-: XISF.StartHeader ( buff -- )
-	0 XISFHeaderLength !
+: XISF.StartHeader ( XISFbuff -- )
+	dup XISFBufferPointer !	
 	XISF_Header XISFHeaderPointer !
 ;
 
 : XISF.HeaderLength ( -- n )
-	XISFHeaderPointer @ XISFBuffer XISF_Header -
+	XISFHeaderPointer @ XISFBufferPointer @ XISF_Header -
 ;
 	
 : XISF.WriteToHeader ( addr n -- )
@@ -26,9 +27,9 @@ variable XISFHeaderPointer
 	R> XISFHeaderPointer +!
 ;
 	
-: XISF.FinishHeader ( buff -- )
-	s" XISF0100" ( buff addr n) -rot swap ( addr buffer n ) cmove
-	XISF.HeaderLength XISFBuffer XISF_HEADER_LEN l!
+: XISF.FinishHeader ( -- )
+	 s" XISF0100" XISFBufferPointer @ swap ( caddr buffer u ) cmove
+	 XISF.HeaderLength XISFBufferPointer @ XISF_HEADER_LEN ( len addr) l!
 ;
 
 : XISF.StartXML ( -- )
@@ -40,7 +41,7 @@ variable XISFHeaderPointer
 ;
 
 : XISF.StartImage
-	s\"<Image geometry=\""				XISF.WriteToHeader
+	s\" <Image geometry=\""				XISF.WriteToHeader
 	( width)
 	s\" :"									XISF.WriteToHeader
 	( height)
@@ -66,7 +67,7 @@ variable XISFHeaderPointer
 		s\" <FITSKeyword name=\""		XISF.WriteToHeader
 		( value caddr u) 					XISF.WriteToHeader
 		s\" \" value =\" "				XISF.WriteToHeader
-		( value) <# dup SIGN 0 (value-as-double) #S #> ( caddr u)	XSIF.WriteToHeader
+		( value) <# dup SIGN 0 ( value-as-double) #S #> ( caddr u)	XISF.WriteToHeader
 		s\" \" />\""						XISF.WriteToHeader
 ;
 
@@ -75,6 +76,6 @@ XISF_BUFFER BUFFER: XISFBuffer
 XISFBuffer XISF.StartHeader
 XISF.StartXML
 XISF.FinishXML
-XISFBuffer XISF.FinishHeader
+XISF.FinishHeader
 
 XISFBuffer 64 dump

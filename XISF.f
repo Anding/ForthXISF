@@ -26,6 +26,11 @@ variable XISFHeaderPointer
 	XISFHeaderPointer @ swap cmove
 	R> XISFHeaderPointer +!
 ;
+
+: XISF.WriteIntToHeader ( x -- )
+	<# dup SIGN 0 ( x-as-double) #S #> ( caddr u)
+	XISF.WriteToHeader
+;
 	
 : XISF.FinishHeader ( -- )
 	 s" XISF0100" XISFBufferPointer @ swap ( caddr buffer u ) cmove
@@ -33,6 +38,7 @@ variable XISFHeaderPointer
 ;
 
 : XISF.StartXML ( -- )
+	s\" <?xml version=\"1.0\" encoding=\"UTF-8\"?>"	XISF.WriteToHeader
 	s\" <xisf version=\"1.0\">"		XISF.WriteToHeader
 ;
 
@@ -42,13 +48,13 @@ variable XISFHeaderPointer
 
 : XISF.StartImage
 	s\" <Image geometry=\""				XISF.WriteToHeader
-	( width)
+	640										XISF.WriteIntToHeader	\ width
 	s\" :"									XISF.WriteToHeader
-	( height)
+	480 	 									XISF.WriteIntToHeader	\ height
+	s\" :1\" sampleFormat=\"UInt16\" colorSpace=\"Gray\" location=\"attachment:"	XISF.WriteToHeader
+	0 XISF_DATA 							XISF.WriteIntToHeader	\ location
 	s\" :"									XISF.WriteToHeader
-	s\" \" sampleFormat=\"UInt16\" colorSpace=\"Gray\" location=\"attachment:\"	XISF.WriteToHeader
-	( location)
-	( length)
+	640 480 2 * * 							XISF.WriteIntToHeader	\ size
 	s\" \">"									XISF.WriteToHeader
 ;
 
@@ -56,26 +62,48 @@ variable XISFHeaderPointer
 	s\" </Image>"							XISF.WriteToHeader
 ;
 
-: XISF.MAKE-FITSKEY-INT ( addr caddr u  <name> -- ) 
+: XISF.MAKE-FITSKEY-INT ( caddr u addr <name> -- ) 
 \ defining word for a FITS key with integer value
 \ e.g. variable-name S" FITS-keyword" XISF.MAKE-FITSKEY-INT <name>
 	CREATE 
 		, $,
 	DOES> ( --)
-		dup >R @		( value)
-		R> count		( value caddr u)
+		dup >R @	@							( value)
+		R> cell+ count						( value caddr u)
 		s\" <FITSKeyword name=\""		XISF.WriteToHeader
 		( value caddr u) 					XISF.WriteToHeader
-		s\" \" value =\" "				XISF.WriteToHeader
-		( value) <# dup SIGN 0 ( value-as-double) #S #> ( caddr u)	XISF.WriteToHeader
-		s\" \" />\""						XISF.WriteToHeader
+		s\" \" value=\""					XISF.WriteToHeader
+		( value) 							XISF.WriteIntToHeader
+		s\" \" />"							XISF.WriteToHeader
 ;
 
+: XISF.WriteFile ( caddr n --)
+	w/o create-file if abort" Cannot create XISF file" then
+	>R XISFBufferPointer @ XISF_BUFFER R@	( caddr u fid)
+	write-file if abort" Cannot write XISF file" then
+	R> close-file if abort" Cannot close XISF file" then
+;
+
+\ testing
+
 XISF_BUFFER BUFFER: XISFBuffer
+variable fpos
+2000 fpos !
+
+s" FOCUSPOS" fpos XISF.MAKE-FITSKEY-INT XISF.FITSfocuspos
 
 XISFBuffer XISF.StartHeader
 XISF.StartXML
+XISF.StartImage
+XISF.FITSfocuspos
+XISF.FinishImage
 XISF.FinishXML
 XISF.FinishHeader
 
-XISFBuffer 64 dump
+XISFBuffer 256 dump
+
+s" C:\test\MadeInForth.XISF" XISF.WriteFile
+
+
+
+

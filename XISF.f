@@ -1,5 +1,7 @@
 4032 constant XISFHeaderMaxLen
-640 480 2 * * constant XISFDataMaxLen
+3096 constant XISFMaxImageWidth
+2080 constant XISFMaxImageHeight
+XISFMaxImageWidth XISFMaxImageHeight 2 * * constant XISFDataMaxLen
 
 BEGIN-STRUCTURE XISF_BUFFER
 	8 +FIELD XISF_SIGNATURE
@@ -48,13 +50,13 @@ variable XISFHeaderPointer
 
 : XISF.StartImage
 	s\" <Image geometry=\""				XISF.WriteToHeader
-	640										XISF.WriteIntToHeader	\ width
+	3096										XISF.WriteIntToHeader	\ width
 	s\" :"									XISF.WriteToHeader
-	480 	 									XISF.WriteIntToHeader	\ height
+	2080 	 									XISF.WriteIntToHeader	\ height
 	s\" :1\" sampleFormat=\"UInt16\" colorSpace=\"Gray\" location=\"attachment:"	XISF.WriteToHeader
 	0 XISF_DATA 							XISF.WriteIntToHeader	\ location
 	s\" :"									XISF.WriteToHeader
-	640 480 2 * * 							XISF.WriteIntToHeader	\ size
+	3096 2080 2 * *						XISF.WriteIntToHeader	\ size
 	s\" \">"									XISF.WriteToHeader
 ;
 
@@ -84,25 +86,6 @@ variable XISFHeaderPointer
 	R> close-file if abort" Cannot close XISF file" then
 ;
 
-\ testing
-
-XISF_BUFFER BUFFER: XISFBuffer
-variable fpos
-2000 fpos !
-
-s" FOCUSPOS" fpos XISF.MAKE-FITSKEY-INT XISF.FITSfocuspos
-
-XISFBuffer XISF.StartHeader
-XISF.StartXML
-XISF.StartImage
-XISF.FITSfocuspos
-XISF.FinishImage
-XISF.FinishXML
-XISF.FinishHeader
-
-XISFBuffer 256 dump
-
-s" C:\test\MadeInForth.XISF" XISF.WriteFile
 
 
 

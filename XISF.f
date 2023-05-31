@@ -1,4 +1,4 @@
-4032 constant XISFHeaderMaxLen
+4080 constant XISFHeaderMaxLen			\ XISF_DATA will appear at 4096
 3096 constant XISFMaxImageWidth
 2080 constant XISFMaxImageHeight
 XISFMaxImageWidth XISFMaxImageHeight 2 * * constant XISFDataMaxLen
@@ -10,6 +10,8 @@ BEGIN-STRUCTURE XISF_BUFFER
 	XISFHeaderMaxLen	+FIELD XISF_HEADER		\ header with trailing zeros
 	XISFDataMaxLen		+FIELD XISF_DATA 			\ data with trailing zeros
 END-STRUCTURE
+
+XISF_BUFFER allocate ( addr ior) throw constant XISFBuffer  \ BUFFER: cannot handle allocations of this size
 
 variable XISFBufferPointer
 variable XISFHeaderPointer
@@ -56,7 +58,7 @@ variable XISFHeaderPointer
 	s\" :1\" sampleFormat=\"UInt16\" colorSpace=\"Gray\" location=\"attachment:"	XISF.WriteToHeader
 	0 XISF_DATA 							XISF.WriteIntToHeader	\ location
 	s\" :"									XISF.WriteToHeader
-	3096 2080 2 * *						XISF.WriteIntToHeader	\ size
+	XISFDataMaxLen							XISF.WriteIntToHeader	\ size
 	s\" \">"									XISF.WriteToHeader
 ;
 

@@ -2,18 +2,28 @@
 \ requires XISF.f
 
 \ FITS variables
+\ integers
 shared variable focusPos
-shared variable imageWidth
-shared variable imageHeight
 
+\ strings
 shared variable telescope$
 shared variable instrument$
 
-shared variable date
+\ finite fractions
+shared variable observationDate
+shared variable observationTime
+shared variable targetRA
+shared variable targetDec
+shared variable latitude
+
 
 \ FITS defining words
-s" FOCUSPOS" focusPos XISF.MAKE-FITSKEY-INT FITSfocusPos
-s" FOCUSPOS" focusPos XISF.MAKE-FITSKEY-INT FITSimageWidth
+s" FOCUSPOS" focusPos ' FITS.INT FITS.MAKE FITS.KEYfocusPos
 
-s" INSTRUMENT" instrument$  XISF.MAKE-FITSKEY-STR FITSinstrument$
-s" TELESCOPE" telescope$  XISF.MAKE-FITSKEY-STR FITStelescope$
+s" INSTRUMENT" instrument$  ' FITS.STR FITS.MAKE FITS.KEYinstrument
+s" TELESCOPE" telescope$  ' FITS.STR FITS.MAKE FITS.KEYtelescope
+
+s" DATE-OBS" observationDate ' FITS.FF- FITS.MAKE FITS.KEYdate-obs 
+s" TIME-OBS" observationTime ' FITS.FF: FITS.MAKE FITS.KEYtime-obs 
+s" RA" targetRA ' FITS.FF: FITS.MAKE FITS.KEYRA
+s" DEC" targetDec ' FITS.FF: FITS.MAKE FITS.KEYdec 

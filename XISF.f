@@ -1,5 +1,5 @@
 \ Forth language tools for creating PixInsight XISF image format
-\ requires ForthBase.f
+\ requires ForthBase.f, FiniteFractions.f
 
 \ define the paramaters for the size of the in-memory buffer
 4080 constant XISFHeaderMaxLen			\ XISF_DATA will appear at offset 4096
@@ -41,9 +41,33 @@ SHARED variable ImageHeight
 	R> XISFHeaderPointer +!
 ;
 
-: XISF.WriteIntToHeader ( x -- )
-\ convert an integer to a string and it write to the header at the current cursor location
+: XISF.WriteIntToHeader ( addr n --)
+\ convert an integer to a string and write it to the header at the current cursor location
 	<# dup SIGN 0 ( x-as-double) #S #> ( caddr u)
+	XISF.WriteToHeader
+;
+
+: FITS.str ( addr -)
+\ fetch a counted sting at addr and write it to the header
+	$@ 
+	XISF.WriteToHeader
+;
+
+: FITS.int ( addr -)
+\ fetch an integer at addr, convert it to a string and it write to the header at the current cursor location
+	@
+	XISF.WriteIntToHeader
+;
+
+: FITS.ff: ( f --)
+\ fetch a finite fraction  at addr, convert it to a : separated string and write it to the header
+	@ ':' ~$ ( caddr u)
+	XISF.WriteToHeader
+;
+
+: FITS.ff- ( f --)
+\ fetch a finite fraction  at addr, convert it to a : separated string and write it to the header
+	@ '-' ~$ ( caddr u)
 	XISF.WriteToHeader
 ;
 
@@ -84,33 +108,20 @@ SHARED variable ImageHeight
 	 XISF.HeaderLength XISFBufferPointer @ XISF_HEADER_LEN ( len addr) l!
 ;
 
-: XISF.MAKE-FITSKEY-INT ( caddr u addr <name> -- ) 
-\ defining word for a FITS key with integer value
-\ e.g. variable-name S" FITS-keyword" XISF.MAKE-FITSKEY-INT <name>
+: FITS.MAKE ( caddr u variable XT <name> -- ) 
+\ defining word for a FITS key
+\ e.g. s" FOCUSPOS" focusPos ' FITS.INT FITS.MAKE FITS.KEYfocusPos
 	CREATE 
-		, $,
+		, , $, 								( PFA: XT, variable, counted-string)
 	DOES> ( --)
-		dup >R @								( addr)
-		R> cell+ count						( value caddr u)
+		>R										( R:PFA)
+		R@ 2 cells+ $@						( caddr u R:PFA)
 		s\" <FITSKeyword name=\""		XISF.WriteToHeader
-		( addr caddr u) 					XISF.WriteToHeader
+		( caddr u) 							XISF.WriteToHeader
 		s\" \" value=\""					XISF.WriteToHeader
-		@ ( value) 							XISF.WriteIntToHeader
-		s\" \" />"							XISF.WriteToHeader
-;
-
-: XISF.MAKE-FITSKEY-STR ( caddr u addr <name> -- ) 
-\ defining word for a FITS key with a counted string
-\ e.g. string-name S" FITS-keyword" XISF.MAKE-FITSKEY-INT <name>
-	CREATE 
-		, $,
-	DOES> ( --)
-		dup >R @								( addr)
-		R> cell+ count						( value caddr u)
-		s\" <FITSKeyword name=\""		XISF.WriteToHeader
-		( addr caddr u) 					XISF.WriteToHeader
-		s\" \" value=\""					XISF.WriteToHeader
-		$@ ( value) 						XISF.WriteToHeader
+		R@ cell+ @							( variable R:PFA)
+		R>	@									( variable XT)
+		execute		
 		s\" \" />"							XISF.WriteToHeader
 ;
 

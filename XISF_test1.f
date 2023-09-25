@@ -26,3 +26,4 @@ XISF.FinishHeader
 XISFBuffer 512 dump
 
 s" C:\test\MadeInForth.XISF" XISF.WriteFile
+s" C:\test\MadeInForth.XISF" CR type CR

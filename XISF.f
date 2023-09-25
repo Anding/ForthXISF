@@ -88,7 +88,7 @@ SHARED variable ImageHeight
 	s\" :"									XISF.WriteToHeader
 	( width height) 2 * * dup 			XISF.WriteIntToHeader	\ size in bytes of the image buffer
 	s\" \">"									XISF.WriteToHeader
-	( dataSize) 0 XISF_HEADER + XISFBufferSize !					\ update the buffer size to match the image size
+	( dataSize) 0 XISF_DATA + XISFBufferSize !					\ update the buffer size to match the image size
 ;
 
 : XISF.FinishImage

@@ -1,26 +1,46 @@
 \ Forth language tools for creating PixInsight XISF image format
 \ requires ForthBase.f, FiniteFractions.f
 
-\ define the paramaters for the size of the in-memory buffer
-4080 constant XISFHeaderMaxLen			\ XISF_DATA will appear at offset 4096
-3096 constant XISFMaxImageWidth
-2080 constant XISFMaxImageHeight
-XISFMaxImageWidth XISFMaxImageHeight 2 * * constant XISFDataMaxLen
+4096 constant XISF_HEADER_SIZE
+
+\ descriptor data structure for an image
+BEGIN-STRUCTURE
+					IMAGE_DESCRIPTOR
+					4 	+FIELD IMAGE_WIDTH				\ width in pixels
+					4 	+FIELD IMAGE_HEIGHT				\ height in pixels
+					4 	+FIELD IMAGE_DEPTH				\ depth in bitplanes
+					4 	+FIELD META_MAP					\ pointer to the key-value metadata map	
+BUFFER_DESCRIPTOR +FIELD XISF_BUFFER				\ descriptior to the XISF header buffer
+XISF_HEADER_SIZE	+FIELD XISF_HEADER				\ XISF header buffer
+					0 	+FIELD IMAGE_BITMAP				\ pointer to the image buffer
+END-STRUCTURE
+
+: new-image  ( width height depth -- img)
+\ allocate memory and establish a new image, as represented by a descriptor
+	>R 2dup R> dup ( 3dup)
+	* * 2* IMAGE_DESCRIPTOR + 
+	allocate if abort" Unable to allocate memory" then
+	>R					( w h d R: img)
+	R@ IMAGE_DEPTH !
+	R@ IMAGE_HEIGHT !
+	R@ IMAGE_WIDTH !
+	\ map R@ META_MAP !	
+;
 
 \ XISF monolithic file structure, from the XISF specification
-BEGIN-STRUCTURE XISF_BUFFER
-	8 +FIELD XISF_SIGNATURE
-	4 +FIELD XISF_HEADER_LEN
-	4 +FIELD XISF_RESERVED
-	XISFHeaderMaxLen	+FIELD XISF_HEADER		\ header with trailing zeros
-	XISFDataMaxLen		+FIELD XISF_DATA 			\ data with trailing zeros
+BEGIN-STRUCTURE 
+					XISF_BUFFER
+	8 +FIELD 	XISF_SIGNATURE
+	4 +FIELD 	XISF_HEADER_LEN
+	4 +FIELD 	XISF_RESERVED
+	XISF_HEADER_SIZE 0 XISF_SIGNATURE XISF_HEADER_LEN XISF_RESERVED -
+	  +FIELD 	XISF_HEADER		\ header with trailing zeros
+	0 +FIELD 	XISF_DATA 		\ image bitmap with trailing zeros
 END-STRUCTURE
 
 variable XISFBufferPointer		\ address of the start of the presently active buffer
 variable XISFHeaderPointer		\ address of the current 'cursor location' in the presently active buffer
 variable XISFBufferSize			\ size of the presently active buffer
-SHARED variable ImageWidth		\ these variables will be set later by camera code
-SHARED variable ImageHeight
 	
 : XISF.HeaderLength ( -- n )
 \ compute the length in bytes of header as currently written

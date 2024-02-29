@@ -10,8 +10,8 @@ BEGIN-STRUCTURE
 					4 	+FIELD IMAGE_HEIGHT				\ height in pixels
 					4 	+FIELD IMAGE_DEPTH				\ depth in bitplanes
 					4 	+FIELD META_MAP					\ pointer to the key-value metadata map	
-BUFFER_DESCRIPTOR +FIELD XISF_BUFFER				\ descriptior to the XISF header buffer
-XISF_HEADER_SIZE	+FIELD XISF_HEADER				\ XISF header buffer
+BUFFER_DESCRIPTOR +FIELD XISF_BUFFER				\ descriptor to the XISF header buffer
+XISF_HEADER_SIZE	+FIELD XISF_HEADER				\ XISF header buffer immediately follows the descriptor
 					0 	+FIELD IMAGE_BITMAP				\ pointer to the image buffer
 END-STRUCTURE
 
@@ -38,56 +38,19 @@ BEGIN-STRUCTURE
 	0 +FIELD 	XISF_DATA 		\ image bitmap with trailing zeros
 END-STRUCTURE
 
-variable XISFBufferPointer		\ address of the start of the presently active buffer
-variable XISFHeaderPointer		\ address of the current 'cursor location' in the presently active buffer
-variable XISFBufferSize			\ size of the presently active buffer
-	
-: XISF.HeaderLength ( -- n )
-\ compute the length in bytes of header as currently written
-	XISFHeaderPointer @ XISFBufferPointer @ XISF_Header -
-;
-
-: XISF.StartHeader ( XISFbuff -- )
+: XISF.StartHeader ( img -- )
 \ call this once to initialize the header
-	dup XISFBufferPointer !	
-	XISF_Header dup XISFHeaderPointer !
-	XISFHeaderMaxLen 0 ( addr n 0) fill		\ zero the header
+	XISF_BUFFER reset-buffer
 ;
 
-: XISF.WriteToHeader ( addr n -- )
+: XISF.WriteToHeader ( addr n img -- )
 \ write a string to the buffer at the current cursor location
-	dup >R
-	XISFHeaderPointer @ swap cmove
-	R> XISFHeaderPointer +!
+	XISF_BUFFER write-buffer	
 ;
 
-: XISF.WriteIntToHeader ( addr n --)
+: XISF.WriteIntToHeader ( x img --)
 \ convert an integer to a string and write it to the header at the current cursor location
-	<# dup SIGN 0 ( x-as-double) #S #> ( caddr u)
-	XISF.WriteToHeader
-;
-
-: FITS.str ( addr -)
-\ fetch a counted sting at addr and write it to the header
-	$@ 
-	XISF.WriteToHeader
-;
-
-: FITS.int ( addr -)
-\ fetch an integer at addr, convert it to a string and it write to the header at the current cursor location
-	@
-	XISF.WriteIntToHeader
-;
-
-: FITS.ff: ( f --)
-\ fetch a finite fraction  at addr, convert it to a : separated string and write it to the header
-	@ ':' ~$ ( caddr u)
-	XISF.WriteToHeader
-;
-
-: FITS.ff- ( f --)
-\ fetch a finite fraction  at addr, convert it to a : separated string and write it to the header
-	@ '-' ~$ ( caddr u)
+	>R (.) ( caddr u) R>
 	XISF.WriteToHeader
 ;
 
@@ -127,6 +90,33 @@ variable XISFBufferSize			\ size of the presently active buffer
 	 s" XISF0100" XISFBufferPointer @ swap ( caddr buffer u ) cmove
 	 XISF.HeaderLength XISFBufferPointer @ XISF_HEADER_LEN ( len addr) l!
 ;
+
+
+: FITS.str ( addr -)
+\ fetch a counted sting at addr and write it to the header
+	$@ 
+	XISF.WriteToHeader
+;
+
+: FITS.int ( addr -)
+\ fetch an integer at addr, convert it to a string and it write to the header at the current cursor location
+	@
+	XISF.WriteIntToHeader
+;
+
+: FITS.ff: ( f --)
+\ fetch a finite fraction  at addr, convert it to a : separated string and write it to the header
+	@ ':' ~$ ( caddr u)
+	XISF.WriteToHeader
+;
+
+: FITS.ff- ( f --)
+\ fetch a finite fraction  at addr, convert it to a : separated string and write it to the header
+	@ '-' ~$ ( caddr u)
+	XISF.WriteToHeader
+;
+
+
 
 : FITS.MAKE ( caddr u variable XT <name> -- ) 
 \ defining word for a FITS key

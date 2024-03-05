@@ -3,7 +3,8 @@
 include "%idir%\buffers.f"
 include "%idir%\..\simple-tester\simple-tester.f"
 
-1024 allocate-buffer constant buf1
+1024 allocate-buffer 
+constant buf1
 
 CR
 Tstart
@@ -28,9 +29,30 @@ T{ s" ABC" drop 1000 buf1 write-buffer }T -1 ==
 T{ buf1 buffer_used }T 25 ==
 T{ buf1 buffer_space }T 999 ==
 
+T{ buf1 buffer-to-string nip }T 25 ==
+
 Tend
 
-buf1 BUFFER_ADDR 32 dump
-buf1 free-buffer
+\ review buf1
+buf1 buffer-to-string dump
 
+\ serialize buf1 to a file
+CR ." create-file IOR: "
+s" %idir%\buffers_test1.txt" r/w create-file . CR 
+constant test_fileid
+buf1 test_fileid buffer-to-file 
+
+test_fileid file-size . . .
+
+\ map the file to buf2
+test_fileid file-to-buffer
+constant buf2
+
+\ review buf2
+buf2  .s                    
+
+\ release resources
+buf1 free-buffer
+\ buf2 free-buffer
+\ test_fileid close-file drop
 

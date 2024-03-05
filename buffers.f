@@ -64,12 +64,12 @@ END-STRUCTURE
 
 : file-to-buffer ( fileid -- buf)
 \ memory map a file to a newly allocated buffer and return the descriptor
-	dup 0 0 rot reposition-file abort" cannot access file"
 	dup file-size abort" cannot access file" drop	( fileid size)					\ file-size returns a double			
+	over 0 0 rot reposition-file abort" cannot access file"
 	dup allocate-buffer >R									( fileid size R:buf)			\ allocate a suitable buffer
-	R@ BUFFER_ADDR swap rot									( addr n fileid R:buf)
-	read-file abort" cannot access file" 				( n R:s$)
-	R> BUFFER_POINTER +! R>									
+	dup rot R@ BUFFER_ADDR -rot							( n addr n fileid R:buf)
+	read-file abort" cannot access file" drop			( n R:buf)
+	R@ BUFFER_POINTER +! R>									
 ;
 
 : buffer-to-string ( buf -- c-addr u)

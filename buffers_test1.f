@@ -42,17 +42,15 @@ s" %idir%\buffers_test1.txt" r/w create-file . CR
 constant test_fileid
 buf1 test_fileid buffer-to-file 
 
-test_fileid file-size . . .
-
 \ map the file to buf2
 test_fileid file-to-buffer
 constant buf2
 
 \ review buf2
-buf2  .s                    
+buf2 buffer-to-string dump                  
 
 \ release resources
 buf1 free-buffer
-\ buf2 free-buffer
+buf2 free-buffer
 \ test_fileid close-file drop
 

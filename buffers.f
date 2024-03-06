@@ -1,4 +1,4 @@
-\ buffer operations
+\ a descriptor based approach to buffers
 
 \ descriptor data structure for an buffer
 BEGIN-STRUCTURE	BUFFER_DESCRIPTOR
@@ -52,7 +52,7 @@ END-STRUCTURE
 	0
 ;
 
-: echo-buffer ( c buf -- n)
+: echo-buffer ( c buf -- ior)
 \ write (echo) a character to the buffer advance the buffer pointer
 \ bounds checked, ior  = -1 if insufficient space
 	>R
@@ -83,7 +83,7 @@ END-STRUCTURE
 \ save the contents (used portion) of the buffer to fileid
 	>R
 	buffer-to-string
- 	R>								( addr n fileid)
+ 	R>				  ( addr n fileid)
 	write-file abort" cannot access file"	
 ;
 		

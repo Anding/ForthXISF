@@ -31,26 +31,25 @@ T{ buf1 buffer_space }T 999 ==
 
 T{ buf1 buffer-to-string nip }T 25 ==
 
-Tend
-
-\ review buf1
-buf1 buffer-to-string dump
-
 \ serialize buf1 to a file
-CR ." create-file IOR: "
-s" %idir%\buffers_test1.txt" r/w create-file . CR 
-constant test_fileid
-buf1 test_fileid buffer-to-file 
+	s" %idir%\buffers_test1.txt" r/w create-file drop
+	constant test_fileid
+	buf1 test_fileid buffer-to-file 
 
 \ map the file to buf2
-test_fileid file-to-buffer
-constant buf2
+	test_fileid file-to-buffer
+	constant buf2
 
-\ review buf2
-buf2 buffer-to-string dump                  
+T{ buf1 buffer-to-string hashS }T buf2 buffer-to-string hashS ==
+
+Tend
+
+\ review buffers
+	buf1 buffer-to-string dump
+	buf2 buffer-to-string dump                  
 
 \ release resources
-buf1 free-buffer
-buf2 free-buffer
-\ test_fileid close-file drop
+	buf1 free-buffer
+	buf2 free-buffer
+	test_fileid close-file drop
 

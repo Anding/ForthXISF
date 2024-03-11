@@ -1,15 +1,15 @@
 \ simple xml writer
 \ requires buffers.f
 
-: xml.write ( c-addr u buff --)
+: xml.write ( c-addr u buf --)
 	write-buffer abort" XML buffer full"
 ;
 
-: xml.echo ( c buff --)
+: xml.echo ( c buf --)
 	echo-buffer abort" XML buffer full"
 ;	
 
-: xml.<??> ( buff -- )
+: xml.<??> ( buf -- )
 \ write the full XML prolog tag and newline (Windows format)
 	s\" <?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n" rot xml.write
 ;
@@ -34,18 +34,26 @@
 : xml.</tag> ( c-addr u buf --)
 \ write an XML end-tag and newline (Windows format)
 	>R
-	s"</ " R@ xml.write
+	s" </" R@ xml.write
 	R@ xml.write
 	s\" >\r\n" R> xml.write
 ;
 
-: xml.key=val ( c-addr1 u1 c-addr2 u2 buf --)
+: xml.keyval ( c-addr1 u1 c-addr2 u2 buf --)
 \ write a key (c-addr1 u1) value (c-addr2 u2) pair
+	>R										( c1 u1 c2 u2 R:b)
+	BL R@ xml.echo						( c1 u1 c2 u2 R:b)		\ ' ' is not a space!
+	2swap R@ xml.write				( c2 u2 R:b)
+	s\" =\"" R@ xml.write			( c2 u2 R:b)
+	R@ xml.write						( R:b)
+	'"' R> xml.echo					( )
+;
+
+: xml.comment ( c-addr u buf --)
+\ write an XML comment
 	>R
-	' ' R@ xml.echo
-	2swap R@ xml.write
-	s\"=\"" R@ xml.write
+	s" <!-- " R@ xml.write
 	R@ xml.write
-	'"' R> xml.echo
+	s\"  -->\r\n" R> xml.write
 ;
 	

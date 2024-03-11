@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with ForthXISF -->
+<xisf version="1.0">
+<Image geometry="6:6:3" sampleFormat="UInt8" colorSpace="RGB" location="embedded">
+<Data encoding="base64">
+AAAAAP8A/wD/AAAAAAAAAP8AAP8AAAAAAAAA/wD/AP8AAAAA/wD//wD/AP8AAP8A/wD//wD//wD//wD/AP8AAP8A/wD//wD/AP8AAAAAAAAA/wD/AP8AAAAAAAAAAP8A/wD/AAAAAAAAAP8A</Data>
+<Property id="Observation:Center:RA" type="Float64" value="195.4998" />
+</Image>
+</xisf>

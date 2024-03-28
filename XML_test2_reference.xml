@@ -1,0 +1,5 @@
+<Property id="OBSERVATION:CENTER:RA" type="Float64" value="195.4997911" />
+<Property id="OBSERVATION:CENTER:DEC" type="Float64" value="47.2661464" />
+<Property id="OBSERVATION:STARTTIME" type="TimePoint" value="'2024-03-15T02:55:15'" />
+<Property id="OBSERVATION:LOCATION:NAME" type="String">
+Observatorio de Aras de los Olmos (OAO)</Property>

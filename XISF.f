@@ -1,11 +1,10 @@
 \ Forth language tools for creating PixInsight XISF image format
-\ requires ForthBase.f, FiniteFractions.f
+\ requires buffers.f, ForthBase.f, FiniteFractions.f
 
 4096 constant XISF_HEADER_SIZE
 
 \ descriptor data structure for an image
-BEGIN-STRUCTURE
-					IMAGE_DESCRIPTOR
+BEGIN-STRUCTURE IMAGE_DESCRIPTOR
 					4 	+FIELD IMAGE_WIDTH				\ width in pixels
 					4 	+FIELD IMAGE_HEIGHT				\ height in pixels
 					4 	+FIELD IMAGE_DEPTH				\ depth in bitplanes
@@ -15,135 +14,42 @@ XISF_HEADER_SIZE	+FIELD XISF_HEADER				\ XISF header buffer immediately follows 
 					0 	+FIELD IMAGE_BITMAP				\ pointer to the image buffer
 END-STRUCTURE
 
-: new-image  ( width height depth -- img)
+: allocate-image  ( width height depth -- img )
 \ allocate memory and establish a new image, as represented by a descriptor
-	>R 2dup R> dup ( 3dup)
-	* * 2* IMAGE_DESCRIPTOR + 
-	allocate if abort" Unable to allocate memory" then
+	3dup
+	2* * * IMAGE_DESCRIPTOR +
+	allocate abort" unable to allocate image"
 	>R					( w h d R: img)
 	R@ IMAGE_DEPTH !
 	R@ IMAGE_HEIGHT !
 	R@ IMAGE_WIDTH !
 	\ map R@ META_MAP !	
+	R>
 ;
 
-\ XISF monolithic file structure, from the XISF specification
-BEGIN-STRUCTURE 
-					XISF_BUFFER
-	8 +FIELD 	XISF_SIGNATURE
-	4 +FIELD 	XISF_HEADER_LEN
-	4 +FIELD 	XISF_RESERVED
-	XISF_HEADER_SIZE 0 XISF_SIGNATURE XISF_HEADER_LEN XISF_RESERVED -
-	  +FIELD 	XISF_HEADER		\ header with trailing zeros
-	0 +FIELD 	XISF_DATA 		\ image bitmap with trailing zeros
-END-STRUCTURE
-
-: XISF.StartHeader ( img -- )
-\ call this once to initialize the header
-	XISF_BUFFER reset-buffer
+: free-image ( img --)
+\ release the memory allocated to an image
+	free drop
 ;
 
-: XISF.WriteToHeader ( addr n img -- )
-\ write a string to the buffer at the current cursor location
-	XISF_BUFFER write-buffer	
+: image-to-file ( img fileid --)
+\ write the image to fileid in XISF format
+\ fileid is not closed
+	>R >R
+	R@ XISF_HEADER					( addr R:fileid img)
+	R@ IMAGE_WIDTH @
+	R@ IMAGE_HEIGHT @
+	R@ IMAGE_DEPTH @
+	2* * * XISF_HEADER_SIZE +	( addr size R:fileid img)
+	R> drop
+ 	R>				  					( addr n fileid)
+	write-file abort" cannot access file"	
 ;
 
-: XISF.WriteIntToHeader ( x img --)
-\ convert an integer to a string and write it to the header at the current cursor location
-	>R (.) ( caddr u) R>
-	XISF.WriteToHeader
+: save-image ( img caddr n --)
+\ save the image to an XISF file with the given (location and) name
+	w/o create-file abort" Cannot create XISF file"
+	>R
+	R@ image-to-file
+	R> close-file abort" Cannot close XISF file"
 ;
-
-: XISF.StartXML ( -- )
-\ call this after XISF.StartHeader
-	s\" <?xml version=\"1.0\" encoding=\"UTF-8\"?>"	XISF.WriteToHeader
-	s\" <xisf version=\"1.0\">"		XISF.WriteToHeader
-;
-
-: XISF.StartImage
-\ call this after XISF.StartXML
-	s\" <Image geometry=\""				XISF.WriteToHeader
-	ImageWidth @ dup						XISF.WriteIntToHeader	\ width
-	s\" :"									XISF.WriteToHeader
-	ImageHeight @ dup						XISF.WriteIntToHeader	\ height
-	s\" :1\" sampleFormat=\"UInt16\" colorSpace=\"Gray\" location=\"attachment:"	XISF.WriteToHeader
-	0 XISF_DATA ( ... offset)			XISF.WriteIntToHeader	\ location
-	s\" :"									XISF.WriteToHeader
-	( width height) 2 * * dup 			XISF.WriteIntToHeader	\ size in bytes of the image buffer
-	s\" \">"									XISF.WriteToHeader
-	( dataSize) 0 XISF_DATA + XISFBufferSize !					\ update the buffer size to match the image size
-;
-
-: XISF.FinishImage
-\ call this after XISF.StartImage and any optional FITS keywords
-	s\" </Image>"							XISF.WriteToHeader
-;
-
-: XISF.FinishXML
-\ call this after XISF.FinishImage
-	s\" </xisf>"							XISF.WriteToHeader
-;
-
-: XISF.FinishHeader ( -- )
-\ call this after XISF.FinishXML
-\ completes the header according to XISF specification
-	 s" XISF0100" XISFBufferPointer @ swap ( caddr buffer u ) cmove
-	 XISF.HeaderLength XISFBufferPointer @ XISF_HEADER_LEN ( len addr) l!
-;
-
-
-: FITS.str ( addr -)
-\ fetch a counted sting at addr and write it to the header
-	$@ 
-	XISF.WriteToHeader
-;
-
-: FITS.int ( addr -)
-\ fetch an integer at addr, convert it to a string and it write to the header at the current cursor location
-	@
-	XISF.WriteIntToHeader
-;
-
-: FITS.ff: ( f --)
-\ fetch a finite fraction  at addr, convert it to a : separated string and write it to the header
-	@ ':' ~$ ( caddr u)
-	XISF.WriteToHeader
-;
-
-: FITS.ff- ( f --)
-\ fetch a finite fraction  at addr, convert it to a : separated string and write it to the header
-	@ '-' ~$ ( caddr u)
-	XISF.WriteToHeader
-;
-
-
-
-: FITS.MAKE ( caddr u variable XT <name> -- ) 
-\ defining word for a FITS key
-\ e.g. s" FOCUSPOS" focusPos ' FITS.INT FITS.MAKE FITS.KEYfocusPos
-	CREATE 
-		, , $, 								( PFA: XT, variable, counted-string)
-	DOES> ( --)
-		>R										( R:PFA)
-		R@ 2 cells+ $@						( caddr u R:PFA)
-		s\" <FITSKeyword name=\""		XISF.WriteToHeader
-		( caddr u) 							XISF.WriteToHeader
-		s\" \" value=\""					XISF.WriteToHeader
-		R@ cell+ @							( variable R:PFA)
-		R>	@									( variable XT)
-		execute		
-		s\" \" />"							XISF.WriteToHeader
-;
-
-: XISF.WriteFile ( caddr n --)
-\ write the XISF buffer to an XISF file with the given (location and) name
-	w/o create-file if abort" Cannot create XISF file" then
-	>R XISFBufferPointer @ XISFBufferSize @ R@					( caddr u fid)
-	write-file if abort" Cannot write XISF file" then
-	R> close-file if abort" Cannot close XISF file" then
-;
-
-
-
-
-

@@ -2,11 +2,11 @@
 \ requires buffers.f
 
 : xml.write ( c-addr u buf --)
-	write-buffer abort" XML buffer full"
+	write-buffer ABORT" XML buffer full"
 ;
 
 : xml.echo ( c buf --)
-	echo-buffer abort" XML buffer full"
+	echo-buffer ABORT" XML buffer full"
 ;	
 
 : xml.<??> ( buf -- )
@@ -47,6 +47,14 @@
 	s\" =\"" R@ xml.write			( c2 u2 R:b)
 	R@ xml.write						( R:b)
 	'"' R> xml.echo					( )
+;
+
+: xml.append ( c-addr u buf --)
+\ append a strng to the value just written and reclose
+	>R
+	R@ backspace-buffer ABORT" XML buffer empty"
+	R@ xml.write
+	'"' R> xml.echo
 ;
 
 : xml.comment ( c-addr u buf --)

@@ -37,7 +37,8 @@ include "%idir%\..\simple-tester\simple-tester.f"
 				s" Property" R@ xml.<tag
 					s" id" s" Observation:Center:RA" R@ xml.keyval
 					s" type" s" Float64" R@ xml.keyval
-					s" value" s" 195.4998" R@ xml.keyval
+					s" value" s" 195" R@ xml.keyval
+					s" .4998" R@ xml.append		\ expect value="195.4998"
 				R@ xml./>
 				
 		s" Image" R@ xml.</tag>

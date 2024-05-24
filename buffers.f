@@ -62,6 +62,17 @@ END-STRUCTURE
 	0
 ;
 
+: backspace-buffer ( buf -- ior)
+\ decrement the buffer pointer, as if a backspace had been keyed
+	>R
+	R@ buffer_used
+	if ( buffer_used <> 0)
+		-1 R> BUFFER_POINTER +!  ( ior) 0
+	else 
+		R> drop ( ior) -1
+	then 
+;
+
 : file-to-buffer ( fileid -- buf)
 \ memory map a file to a newly allocated buffer and return the descriptor
 	dup file-size abort" cannot access file" drop	( fileid size)					\ file-size returns a double			

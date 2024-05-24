@@ -11,7 +11,7 @@ BEGIN-STRUCTURE IMAGE_DESCRIPTOR
 					4 	+FIELD META_MAP					\ pointer to the key-value metadata map	
 BUFFER_DESCRIPTOR +FIELD XISF_BUFFER				\ descriptor to the XISF header buffer
 XISF_HEADER_SIZE	+FIELD XISF_HEADER				\ XISF header buffer immediately follows the descriptor
-					0 	+FIELD IMAGE_BITMAP				\ pointer to the image buffer
+					0 	+FIELD IMAGE_BITMAP				\ image bitmap immediately follows the XISF header
 END-STRUCTURE
 
 : allocate-image  ( width height depth -- img )
@@ -23,6 +23,7 @@ END-STRUCTURE
 	R@ IMAGE_DEPTH !
 	R@ IMAGE_HEIGHT !
 	R@ IMAGE_WIDTH !
+	R@ XISF_BUFFER reset-buffer
 	\ map R@ META_MAP !	
 	R>
 ;
@@ -32,17 +33,44 @@ END-STRUCTURE
 	free drop
 ;
 
+: image_size ( img -- size_in_bytes)
+	>R
+	R@ IMAGE_WIDTH @
+	R@ IMAGE_HEIGHT @
+	R> IMAGE_DEPTH @
+	2* * * 
+;
+	
+
+: initialize-XISFimage ( img)
+\ prepare the image in XISF format
+	dup >R XISF_BUFFER >R	( R: img buf)
+	s" XISF010000000000" R@ write-buffer abort" buffer full"	\ XISF signature \ XISF header length \ XISF reserved
+	R@ xml.<??>
+	s" xisf" R@ xml.<tag
+		s" version" s" 1.0" R@ xml.keyval
+	R@ xml.>
+	s" Image" R@ xml.<tag
+		s" geometry"
+			2R@ drop IMAGE_WIDTH @ 2R@ drop IMAGE_HEIGHT @ 2R@ drop IMAGE_DEPTH @
+			':' ~~~$	( finite fractions utility) R@ xml.keyval
+		s" sampleFormat" s" UInt16" R@ xml.keyval
+		s" colorSpace"   s" Gray" R@ xml.keyval
+		s" location" s" attachment:" R@ xml.keyval
+			0 IMAGE_BITMAP 0 <# #s #> R@ xml.append s" :" R@ xml.append
+			2R@ drop image_size <# #s #> R@ xml.append
+	R@ xml.>
+	R> R> drop
+;	
+
 : image-to-file ( img fileid --)
 \ write the image to fileid in XISF format
 \ fileid is not closed
 	>R >R
-	R@ XISF_HEADER					( addr R:fileid img)
-	R@ IMAGE_WIDTH @
-	R@ IMAGE_HEIGHT @
-	R@ IMAGE_DEPTH @
-	2* * * XISF_HEADER_SIZE +	( addr size R:fileid img)
+	R@ XISF_HEADER							( addr R:fileid img)
+	R@ image_size XISF_HEADER_SIZE +	( addr file_size R:fileid img)
 	R> drop
- 	R>				  					( addr n fileid)
+ 	R>				  							( addr n fileid)
 	write-file abort" cannot access file"	
 ;
 

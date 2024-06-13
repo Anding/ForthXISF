@@ -23,7 +23,7 @@ END-STRUCTURE
 	R@ IMAGE_DEPTH !
 	R@ IMAGE_HEIGHT !
 	R@ IMAGE_WIDTH !
-	R@ XISF_BUFFER reset-buffer
+	XISF_HEADER_SIZE R@ XISF_BUFFER ( size buf) declare-buffer
 	\ map R@ META_MAP !	
 	R>
 ;

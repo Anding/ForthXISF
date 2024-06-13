@@ -15,13 +15,22 @@ END-STRUCTURE
 	R@ BUFFER_ADDR R> BUFFER_SIZE @ ERASE
 ;
 
-: allocate-buffer ( n -- buf)
-\ allocate space on the heap for buffer and descriptor
-	dup BUFFER_DESCRIPTOR + allocate abort" unable to allocate buffer"
-	( n buf) >R
+: declare-buffer ( size buf -- )
+\ prepare the descriptor of already allocated memory
+\ size = sizeof(BUFFER), but size + BUFFER_DESCRIPTOR must be already allocated
+	>R 
 	R@ BUFFER_SIZE !
 	R@ reset-buffer
-	R>
+	R> drop
+;
+
+: allocate-buffer ( size -- buf)
+\ allocate space on the heap and prepare the descriptor
+\ size = sizeof(BUFFER), but size + BUFFER_DESCRIPTOR will be allocated
+	dup BUFFER_DESCRIPTOR + allocate abort" unable to allocate buffer"
+	dup -rot
+	( buf size buf) declare-buffer
+	( buf)
 ; 
 
 : free-buffer ( buf --)

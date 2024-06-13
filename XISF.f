@@ -42,7 +42,7 @@ END-STRUCTURE
 ;
 	
 
-: initialize-XISFimage ( img)
+: initialize-XISFimage ( img --)
 \ prepare the image in XISF format
 	dup >R XISF_BUFFER >R	( R: img buf)
 	s" XISF010000000000" R@ write-buffer abort" buffer full"	\ XISF signature \ XISF header length \ XISF reserved
@@ -58,9 +58,11 @@ END-STRUCTURE
 		s" colorSpace"   s" Gray" R@ xml.keyval
 		s" location" s" attachment:" R@ xml.keyval
 			0 IMAGE_BITMAP 0 <# #s #> R@ xml.append s" :" R@ xml.append
-			2R@ drop image_size <# #s #> R@ xml.append
+			2R@ drop image_size 0 <# #s #> R@ xml.append
 	R@ xml.>
-	R> R> drop
+	s" Image" R@ xml.</tag>
+	s" xisf" R@ xml.</tag>
+	R> R> drop drop
 ;	
 
 : image-to-file ( img fileid --)

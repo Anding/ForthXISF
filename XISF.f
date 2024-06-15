@@ -1,5 +1,6 @@
 \ Forth language tools for creating PixInsight XISF image format
 \ requires buffers.f, ForthBase.f, FiniteFractions.f
+\ https://pixinsight.com/doc/docs/XISF-1.0-spec/XISF-1.0-spec.html
 
 4096 constant XISF_HEADER_SIZE
 
@@ -40,11 +41,12 @@ END-STRUCTURE
 	R> IMAGE_DEPTH @
 	2* * * 
 ;
-	
 
 : initialize-XISFimage ( img --)
 \ prepare the image in XISF format
+\ called by image-to-file
 	dup >R XISF_BUFFER >R	( R: img buf)
+	R@ reset-buffer
 	s" XISF010000000000" R@ write-buffer abort" buffer full"	\ XISF signature \ XISF header length \ XISF reserved
 	R@ xml.<??>
 	s" xisf" R@ xml.<tag
@@ -62,6 +64,7 @@ END-STRUCTURE
 	R@ xml.>
 	s" Image" R@ xml.</tag>
 	s" xisf" R@ xml.</tag>
+	R@ buffer_used R@ BUFFER_DESCRIPTOR + 8 + !	\ store the XISF header length
 	R> R> drop drop
 ;	
 
@@ -69,6 +72,7 @@ END-STRUCTURE
 \ write the image to fileid in XISF format
 \ fileid is not closed
 	>R >R
+	R@ initialize-XISFimage
 	R@ XISF_HEADER							( addr R:fileid img)
 	R@ image_size XISF_HEADER_SIZE +	( addr file_size R:fileid img)
 	R> drop

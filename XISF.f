@@ -59,7 +59,7 @@ END-STRUCTURE
 		s" sampleFormat" s" UInt16" R@ xml.keyval
 		s" colorSpace"   s" Gray" R@ xml.keyval
 		s" location" s" attachment:" R@ xml.keyval
-			0 IMAGE_BITMAP 0 <# #s #> R@ xml.append s" :" R@ xml.append
+			XISF_HEADER_SIZE 0 <# #s #> R@ xml.append s" :" R@ xml.append
 			2R@ drop image_size 0 <# #s #> R@ xml.append
 	R@ xml.>
 	s" Image" R@ xml.</tag>

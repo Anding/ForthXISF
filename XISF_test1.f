@@ -2,7 +2,10 @@
 include "%idir%\..\ForthBase\ForthBase.f"
 include "%idir%\..\ForthBase\FiniteFractions\FiniteFractions.f"
 include "%idir%\..\ForthBase\buffers\buffers.f"
+include "%idir%\..\forth-map\map.fs"
+include "%idir%\..\forth-map\map-tools.fs"
 include "%idir%\..\ForthXML\xml.f"
+include "%idir%\XISF_FITS.f"
 include "%idir%\XISF.f"
 include "%idir%\..\simple-tester\simple-tester.f"
 
@@ -11,6 +14,13 @@ Tstart
 
 	640 480 1 allocate-image
 	CONSTANT img1
+	
+	256 -> map.space					\ prepare for counted string storage
+	map CONSTANT map1
+		s" FOCUSPOS" map1 >addr s" 2000" rot place
+		s" INSTRUMENT"map1 >addr  s" Takahashi CCA-250" rot place
+		s" TIME-OBS" map1 >addr  s" 23:30:35" rot place
+	map1 img1 FITS_MAP !
 	
 T{ img1 image_size }T 640 480 1 2* * * ==
 T{ img1 initialize-XISFimage 0 }T 0 ==		\ check no conflict to repeat the preparation of the XISF buffer

@@ -9,7 +9,7 @@ BEGIN-STRUCTURE IMAGE_DESCRIPTOR
 					4 	+FIELD IMAGE_WIDTH				\ width in pixels
 					4 	+FIELD IMAGE_HEIGHT				\ height in pixels
 					4 	+FIELD IMAGE_DEPTH				\ depth in bitplanes
-					4 	+FIELD META_MAP					\ pointer to the key-value metadata map	
+					4 	+FIELD FITS_MAP					\ pointer to the key-value FITS map	
 BUFFER_DESCRIPTOR +FIELD XISF_BUFFER				\ descriptor to the XISF header buffer
 XISF_HEADER_SIZE	+FIELD XISF_HEADER				\ XISF header buffer immediately follows the descriptor
 					0 	+FIELD IMAGE_BITMAP				\ image bitmap immediately follows the XISF header
@@ -25,7 +25,6 @@ END-STRUCTURE
 	R@ IMAGE_HEIGHT !
 	R@ IMAGE_WIDTH !
 	XISF_HEADER_SIZE R@ XISF_BUFFER ( size buf) declare-buffer
-	\ map R@ META_MAP !	
 	R>
 ;
 
@@ -62,6 +61,7 @@ END-STRUCTURE
 			XISF_HEADER_SIZE 0 <# #s #> R@ xml.append s" :" R@ xml.append
 			2R@ drop image_size 0 <# #s #> R@ xml.append
 	R@ xml.>
+	2R@ drop FITS_MAP @ dup IF R@ ( map buf --) XISF.write-map ELSE drop THEN
 	s" Image" R@ xml.</tag>
 	s" xisf" R@ xml.</tag>
 	R@ buffer_used R@ BUFFER_DESCRIPTOR + 8 + !	\ store the XISF header length

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xisf version="1.0">
+	<Image geometry="640:480:1" sampleFormat="UInt16" colorSpace="Gray" location="attachment:4096:614400">
+		<FITSKeyword name="FOCUSPOS" value="2000" />
+		<FITSKeyword name="INSTRUMENT" value="Takahashi CCA-250" />
+		<FITSKeyword name="TIME-OBS" value="23:30:35" />
+	</Image>
+</xisf>

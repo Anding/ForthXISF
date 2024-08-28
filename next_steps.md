@@ -1,8 +1,12 @@
 XISF next steps
 ===============
 
-Baseline XISF writer now complete subject to further testing
+Additional properties to store in XISF image:
+
+1. offset (obtan from camera properties)
+2. Image type (FLAT, DARK, etc.)
+3. SSID
+
 Possible extensions:
 
-1. Import XISF header to map of FITS keywords
-2. Import XISF file (baseline only) to image buffer
+1. Import XISF file (baseline only) to image buffer

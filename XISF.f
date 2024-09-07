@@ -9,7 +9,8 @@ BEGIN-STRUCTURE IMAGE_DESCRIPTOR
 					4 	+FIELD IMAGE_WIDTH				\ width in pixels
 					4 	+FIELD IMAGE_HEIGHT				\ height in pixels
 					4 	+FIELD IMAGE_DEPTH				\ depth in bitplanes
-					4 	+FIELD FITS_MAP					\ pointer to the key-value FITS map	
+					4 	+FIELD FITS_MAP					\ pointer to the key-value FITS map
+					4	+FIELD XISF_MAP					\ pointer to the key-value XISF map	
 BUFFER_DESCRIPTOR +FIELD XISF_BUFFER				\ descriptor to the XISF header buffer
 XISF_HEADER_SIZE	+FIELD XISF_HEADER				\ XISF header buffer immediately follows the descriptor
 					0 	+FIELD IMAGE_BITMAP				\ image bitmap immediately follows the XISF header
@@ -55,13 +56,12 @@ END-STRUCTURE
 		s" geometry"
 			2R@ drop IMAGE_WIDTH @ 2R@ drop IMAGE_HEIGHT @ 2R@ drop IMAGE_DEPTH @
 			':' ~~~$	( finite fractions utility) R@ xml.keyval
-		s" sampleFormat" s" UInt16" R@ xml.keyval
-		s" colorSpace"   s" Gray" R@ xml.keyval
-		s" location" s" attachment:" R@ xml.keyval
+ 			2R@ drop XISF_MAP @ dup IF R@ ( map buf --) XISF.write-XISFmap ELSE drop THEN
+			s" location" s" attachment:" R@ xml.keyval
 			XISF_HEADER_SIZE 0 <# #s #> R@ xml.append s" :" R@ xml.append
 			2R@ drop image_size 0 <# #s #> R@ xml.append
 	R@ xml.>
-	2R@ drop FITS_MAP @ dup IF R@ ( map buf --) XISF.write-map ELSE drop THEN
+	2R@ drop FITS_MAP @ dup IF R@ ( map buf --) XISF.write-FITSmap ELSE drop THEN
 	s" Image" R@ xml.</tag>
 	s" xisf" R@ xml.</tag>
 	R@ buffer_used R@ BUFFER_DESCRIPTOR + 8 + !	\ store the XISF header length

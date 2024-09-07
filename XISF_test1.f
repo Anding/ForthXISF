@@ -5,7 +5,7 @@ include "%idir%\..\ForthBase\buffers\buffers.f"
 include "%idir%\..\forth-map\map.fs"
 include "%idir%\..\forth-map\map-tools.fs"
 include "%idir%\..\ForthXML\xml.f"
-include "%idir%\XISF_FITS.f"
+include "%idir%\XISF_maps.f"
 include "%idir%\XISF.f"
 include "%idir%\..\simple-tester\simple-tester.f"
 
@@ -15,12 +15,19 @@ Tstart
 	640 480 1 allocate-image
 	CONSTANT img1
 	
-	256 -> map.space					\ prepare for counted string storage
+	map-strings
 	map CONSTANT map1
-		s" FOCUSPOS" map1 >addr s" 2000" rot place
-		s" INSTRUMENT"map1 >addr  s" Takahashi CCA-250" rot place
-		s" TIME-OBS" map1 >addr  s" 23:30:35" rot place
+		s" FOCUSPOS" 	map1 >addr s" 2000" rot place
+		s" INSTRUMENT"	map1 >addr s" SXV-H9" rot place
+		s" TIME-OBS" 	map1 >addr s" 23:30:35" rot place
 	map1 img1 FITS_MAP !
+	
+	map CONSTANT map2
+		s" UInt16" 	map2 =>" sampleFormat"
+		s" Gray" 	map2 =>" colorSpace"
+		s" Light"	map2 =>" IMAGETYPE"
+		s" 500"		map2 =>" OFFSET"
+	map2 img1 XISF_MAP !
 	
 T{ img1 image_size }T 640 480 1 2* * * ==
 T{ img1 initialize-XISFimage 0 }T 0 ==		\ check no conflict to repeat the preparation of the XISF buffer

@@ -11,6 +11,8 @@ BEGIN-STRUCTURE IMAGE_DESCRIPTOR
 					4 	+FIELD IMAGE_DEPTH				\ depth in bitplanes
 					4 	+FIELD FITS_MAP					\ pointer to the key-value FITS map
 					4	+FIELD XISF_MAP					\ pointer to the key-value XISF map	
+BUFFER_DESCRIPTOR +FIELD FILEPATH_BUFFER			\ descriptor to the filepath with filename buffer
+				 256	+FIELD FILEPATH					\ filepath with filename, as a buffer
 BUFFER_DESCRIPTOR +FIELD XISF_BUFFER				\ descriptor to the XISF header buffer
 XISF_HEADER_SIZE	+FIELD XISF_HEADER				\ XISF header buffer immediately follows the descriptor
 					0 	+FIELD IMAGE_BITMAP				\ image bitmap immediately follows the XISF header

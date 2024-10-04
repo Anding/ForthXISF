@@ -70,6 +70,20 @@ END-STRUCTURE
 	R> R> drop drop
 ;	
 
+DEFER write-filepath_buffer ( map buf --)
+\ map is a completed FITSKEY map that will interrogated to create the filename
+\ buf points to IMAGE_DESCRIPTOR..FILEPATH_BUFFER 
+
+: initialize-XISFfilepath ( img --)
+\ prepare the filepath with filename for the XISF file
+\ called by save-image
+	>R
+	R@ FITS_MAP @
+	R> FILEPATH_BUFFER
+	256 over ( size buf) declare-buffer
+	( map buf) write-filepath_buffer
+;
+
 : save-image { img | fileid -- }		\ VFX locals
 \ save the image to an XISF file, the filename is created from the FITSmap
 	img initialize-XISFimage

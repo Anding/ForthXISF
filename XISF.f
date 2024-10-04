@@ -70,22 +70,14 @@ END-STRUCTURE
 	R> R> drop drop
 ;	
 
-: image-to-file ( img fileid --)
-\ write the image to fileid in XISF format
-\ fileid is not closed
-	>R >R
-	R@ initialize-XISFimage
-	R@ XISF_HEADER							( addr R:fileid img)
-	R@ image_size XISF_HEADER_SIZE +	( addr file_size R:fileid img)
-	R> drop
- 	R>				  							( addr n fileid)
-	write-file abort" cannot access file"	
-;
-
-: save-image ( img caddr n --)
-\ save the image to an XISF file with the given (location and) name
-	w/o create-file abort" Cannot create XISF file"
-	>R
-	R@ image-to-file
-	R> close-file abort" Cannot close XISF file"
+: save-image { img | fileid -- }		\ VFX locals
+\ save the image to an XISF file, the filename is created from the FITSmap
+	img initialize-XISFimage
+	img initialize-XISFfilepath
+	img FILEPATH_BUFFER buffer-to-string w/o 
+		create-file abort" Cannot create XISF file" -> fileid
+	img XISF_HEADER							( addr)
+	img image_size XISF_HEADER_SIZE +	( addr file_size)
+		fileid write-file abort" Cannot access file"	
+	fileid close-file abort" Cannot close XISF file"
 ;

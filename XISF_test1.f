@@ -7,6 +7,7 @@ include "%idir%\..\forth-map\map-tools.fs"
 include "%idir%\..\ForthXML\xml.f"
 include "%idir%\XISF_maps.f"
 include "%idir%\XISF.f"
+include "%idir%\XISF_filename.f"
 include "%idir%\..\simple-tester\simple-tester.f"
 
 CR
@@ -29,9 +30,15 @@ Tstart
 		s" 500"		map2 =>" OFFSET"
 	map2 img1 XISF_MAP !
 	
+: test_write-filepath_buffer { map buf -- }									\ VFX locals
+	s" %idir%\XISF_test1.xisf" buf write-buffer drop
+;
+
+	ASSIGN test_write-filepath_buffer TO-DO write-filepath_buffer	
+	
 T{ img1 image_size }T 640 480 1 2* * * ==
 T{ img1 initialize-XISFimage 0 }T 0 ==		\ check no conflict to repeat the preparation of the XISF buffer
-T{ img1 s" %idir%\XISF_test1.xisf" save-image 0 }T 0 ==
+T{ img1 save-image 0 }T 0 ==
 T{	img1 free-image 0 }T 0 ==
 
 \ serialize XISF_test1.xisf and the reference file to buffers

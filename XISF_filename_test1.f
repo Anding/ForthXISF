@@ -1,15 +1,13 @@
 \ test XISF_filename.f
-include "%idir%\..\ForthBase\ForthBase.f"
-include "%idir%\..\ForthBase\windows\windows.f"
-include "%idir%\..\ForthBase\FiniteFractions\FiniteFractions.f"
-include "%idir%\..\ForthBase\buffers\buffers.f"
-include "%idir%\..\forth-map\map.fs"
-include "%idir%\..\forth-map\map-tools.fs"
-include "%idir%\..\ForthXML\xml.f"
-include "%idir%\..\ForthXISF\XISF_maps.f"
-include "%idir%\..\ForthXISF\XISF.f"
-include "%idir%\..\forth-map\map.fs"
-include "%idir%\..\forth-map\map-tools.fs"
+include "%idir%\..\ForthBase\libraries\libraries.f"
+NEED forthbase
+NEED finitefractions
+NEED buffers
+NEED windows
+NEED forth-map
+NEED ForthXML
+
+include "%idir%\XISF.f"
 include "%idir%\XISF_filename.f"
 
 CR

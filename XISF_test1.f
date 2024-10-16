@@ -1,14 +1,13 @@
 \ test for XISF.f
-include "%idir%\..\ForthBase\ForthBase.f"
-include "%idir%\..\ForthBase\FiniteFractions\FiniteFractions.f"
-include "%idir%\..\ForthBase\buffers\buffers.f"
-include "%idir%\..\forth-map\map.fs"
-include "%idir%\..\forth-map\map-tools.fs"
-include "%idir%\..\ForthXML\xml.f"
-include "%idir%\XISF_maps.f"
+include "%idir%\..\ForthBase\libraries\libraries.f"
+NEED forthbase
+NEED finitefractions
+NEED buffers
+NEED forth-map
+NEED ForthXML
+
 include "%idir%\XISF.f"
-include "%idir%\XISF_filename.f"
-include "%idir%\..\simple-tester\simple-tester.f"
+NEED simple-tester
 
 CR
 Tstart

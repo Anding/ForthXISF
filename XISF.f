@@ -111,10 +111,11 @@ DEFER write-filepath_buffer ( map buf --)
 \ prepare the filepath with filename for the XISF file
 \ called by save-image
 	>R
-	R@ FITS_MAP @
-	R> FILEPATH_BUFFER
-	256 over ( size buf) declare-buffer
+	R@ FITS_MAP @ ( map)
+	R> FILEPATH_BUFFER dup >R
+	256 over ( map buf 256 buf) declare-buffer
 	( map buf) write-filepath_buffer
+	R@ ( buf) buffer-drive-to-string	R> buffer-dir-to-string makeDirLevels abort" cannot create image directory"
 ;
 
 : save-image { img | fileid -- }		\ VFX locals

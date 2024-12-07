@@ -7,13 +7,15 @@
 \ format: e:\images\2024-10-04\2024-10-05T00:10:30_1aa02f27
 	\ directory
 	s" e:\images\" buf write-buffer drop
-	s" LOCALDAY" map >string buf write-buffer drop 
+	s" NIGHTOF" map >string buf write-buffer drop 
+	'\' buf echo-buffer drop
+	s" IMAGETYP" map >string buf write-buffer drop 
 	'\' buf echo-buffer drop
 	buf buffer-punctuate-filepath
 	\ filename
-	s" LOCAL-DT" map >string drop 19 buf write-buffer drop 
-	';' buf echo-buffer drop
-	s" UUID" map >string drop 4 buf write-buffer drop
+	s" FILTER" map >string buf write-buffer drop 
+	'-' buf echo-buffer drop
+	s" UUID" map >string drop 24 + 12 buf write-buffer drop
 	s" .xisf" buf write-buffer drop
 ;
 

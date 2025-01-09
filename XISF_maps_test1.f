@@ -9,7 +9,6 @@ include "%idir%\properties_obs.f"
 include "%idir%\properties_rig.f"
 include "%idir%\XISF_maps.f"
 
-map-strings
 map CONSTANT FITSmap
 map CONSTANT XISFmap
 

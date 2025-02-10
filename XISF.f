@@ -2,7 +2,7 @@
 \ requires buffers.f, ForthBase.f, FiniteFractions.f
 \ https://pixinsight.com/doc/docs/XISF-1.0-spec/XISF-1.0-spec.html
 
-4096 constant XISF_HEADER_SIZE
+8192 constant XISF_HEADER_SIZE
 
 \ descriptor data structure for an image
 BEGIN-STRUCTURE IMAGE_DESCRIPTOR

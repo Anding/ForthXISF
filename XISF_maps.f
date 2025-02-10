@@ -43,3 +43,5 @@ TSlength buffer: TSstring
    UUIDString zcount				R@ =>" UUID"				\ requires that add-observationFITS has been called first
 	R> drop
 ;
+
+CR ." finished importing XISF_maps.f" CR

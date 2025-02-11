@@ -13,9 +13,8 @@ TSlength buffer: TSstring
 	>R
 	s"  " 							R@ =>" #OBS"			\ a header to indicate the source of these FITS values	
  	obs.type observationType	R@ =>" IMAGETYP"	
- 	obs.type LIGHT = if	
- 		obs.object					R@ =>" OBJECT"
- 	then
+ 	obs.type LIGHT = if obs.object else 0 0 then
+ 										R@ =>" OBJECT"
 	TSstring 0 timestamp			R@ =>" DATE-OBS"		\ UTC date and time in ISO format
 	TSstring 1 timestamp			R@ =>" LOCAL-DT"		\ local date and time in ISO format
 	TSstring 3 timestamp drop 10	R@ =>" NIGHTOF"	\ local date in midday to midday format

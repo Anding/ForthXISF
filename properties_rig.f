@@ -12,4 +12,4 @@
 0 value rig.focal_len
 
 s"  " $value rig.telescope
-s" https://github.com/Anding/Ptolemy" $value rig.software
+s" github.com/Anding/Ptolemy" $value rig.software

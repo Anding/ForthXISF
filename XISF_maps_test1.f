@@ -12,11 +12,21 @@ include "%idir%\XISF_maps.f"
 map CONSTANT FITSmap
 map CONSTANT XISFmap
 
-s" TAKAHASHI CCA250" $-> rig.telescope
+s" Takahashi Epsilon 160-ED" $-> rig.telescope
+160 -> rig.aperature_dia
+18000 -> rig.aperature_area
+530 -> rig.focal_len
 
+s" Crab_nebula" $-> obs.object
+s" Patrick Moore" $-> obs.observer
+3 -> obs.type
+
+CR
+." FITSmap"
 FITSmap add-observationFITS 
 FITSmap add-rigFITS
-CR FITSmap .map CR
+FITSmap .map CR
 
+." XISFmap"
 XISFmap add-observationXISF
-CR XISFmap .map CR
+XISFmap .map CR

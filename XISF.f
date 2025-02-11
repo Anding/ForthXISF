@@ -112,9 +112,14 @@ DEFER write-filepath_buffer ( map buf --)
 \ called by save-image
 	>R
 	R@ FITS_MAP @ ( map)
-	R> FILEPATH_BUFFER dup >R
+	R> FILEPATH_BUFFER
 	256 over ( map buf 256 buf) declare-buffer
 	( map buf) write-filepath_buffer
+;
+
+: create-imageDirectory ( img --)
+\ if the image directory does not exist on disk, create it
+	FILEPATH_BUFFER ( buf) >R
 	R@ ( buf) buffer-drive-to-string	R> buffer-dir-to-string makeDirLevels abort" cannot create image directory"
 ;
 
@@ -122,10 +127,11 @@ DEFER write-filepath_buffer ( map buf --)
 \ save the image to an XISF file, the filename is created from the FITSmap
 	img initialize-XISFimage
 	img initialize-XISFfilepath
+	img create-imageDirectory
 	img FILEPATH_BUFFER buffer-to-string w/o 
 		create-file abort" Cannot create XISF file" -> fileid
 	img XISF_HEADER							( addr)
 	img image_size XISF_HEADER_SIZE +	( addr file_size)
-		fileid write-file abort" Cannot access file"	
+		fileid write-file abort" Cannot access XISF file"	
 	fileid close-file abort" Cannot close XISF file"
 ;

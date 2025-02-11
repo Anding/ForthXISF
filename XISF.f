@@ -90,7 +90,7 @@ END-STRUCTURE
 	s" Image" R@ xml.<tag
 		s" geometry"
 			2R@ drop IMAGE_WIDTH @ 2R@ drop IMAGE_HEIGHT @ 2R@ drop IMAGE_DEPTH @
-			':' ~~~$	( finite fractions utility) R@ xml.keyval
+			~~~$	( finite fractions utility) R@ xml.keyval
  			2R@ drop XISF_MAP @ dup IF R@ ( map buf --) XISF.write-XISFmap ELSE drop THEN
 			s" location" s" attachment:" R@ xml.keyval
 			XISF_HEADER_SIZE 0 <# #s #> R@ xml.append s" :" R@ xml.append

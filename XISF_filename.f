@@ -4,7 +4,6 @@
 \ map is a completed FITSKEY map that will interrogated to create the filename
 \ buf may point to IMAGE_DESCRIPTOR..FILEPATH_BUFFER to complete the XISF structure
 \ 
-\ format: e:\images\2024-10-04\2024-10-05T00:10:30_1aa02f27
 	\ directory
 	s" e:\images\" buf write-buffer drop
 	s" NIGHTOF" map >string buf write-buffer drop 

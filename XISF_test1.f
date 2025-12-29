@@ -1,11 +1,4 @@
 \ test for XISF.f
-include "%idir%\..\ForthBase\libraries\libraries.f"
-NEED forthbase
-NEED finitefractions
-NEED buffers
-NEED forth-map
-NEED ForthXML
-
 include "%idir%\XISF.f"\
 NEED simple-tester
 

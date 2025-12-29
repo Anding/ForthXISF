@@ -2,6 +2,12 @@
 \ requires buffers.f, ForthBase.f, FiniteFractions.f
 \ https://pixinsight.com/doc/docs/XISF-1.0-spec/XISF-1.0-spec.html
 
+NEED FothBase
+NEED FiniteFractions
+NEED buffers
+NEED forth-map
+NEED ForthXML
+
 8192 constant XISF_HEADER_SIZE
 
 \ descriptor data structure for an image

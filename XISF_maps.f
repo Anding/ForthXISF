@@ -1,6 +1,8 @@
 \ write rig and observation properties to the maps
 \ these property sets are known from the system not from any device
 
+need Windows
+
 UUIDlength buffer: UUIDstring  
 TSlength buffer: TSstring
 

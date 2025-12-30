@@ -97,8 +97,13 @@ END-STRUCTURE
 		s" geometry"
 			2R@ drop IMAGE_WIDTH @ 2R@ drop IMAGE_HEIGHT @ 2R@ drop IMAGE_DEPTH @
 			~~~$	( finite fractions utility) R@ xml.keyval
- 			2R@ drop XISF_MAP @ dup IF R@ ( map buf --) XISF.write-XISFmap ELSE drop THEN
-			s" location" s" attachment:" R@ xml.keyval
+		s" sampleFormat" s" UInt16" R@ xml.keyval
+		s" colorSpace" s" Gray" R@ xml.keyval
+		s" offset" 2R@ drop XISF_MAP s" OFFSET" rot >string R@ xml.keyval
+		s" imageType=" 2R@ drop XISF_MAP s" IMAGETYPE" rot >string R@ xml.keyval
+		s" uuid=" 2R@ drop XISF_MAP s" UUID" rot >string R@ xml.keyval	
+\ 		2R@ drop XISF_MAP @ dup IF R@ ( map buf --) XISF.write-XISFmap ELSE drop THEN
+		s" location" s" attachment:" R@ xml.keyval
 			XISF_HEADER_SIZE 0 <# #s #> R@ xml.append s" :" R@ xml.append
 			2R@ drop image_size 0 <# #s #> R@ xml.append
 	R@ xml.>

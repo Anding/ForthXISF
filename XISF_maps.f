@@ -14,7 +14,7 @@ TSlength buffer: TSstring
 \ add key value pairs for XISF camera parameters
 	>R
  	obs.type observationType	R@	=>" IMAGETYPE"
-   UUIDString make-UUID zcount				R@ =>" UUID"	\ generated UUID			
+   UUIDString make-UUID 		R@ =>" UUID"	\ generated UUID			
 	R> drop
 ;
 

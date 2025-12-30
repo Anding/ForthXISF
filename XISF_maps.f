@@ -10,6 +10,14 @@ TSlength buffer: TSstring
 \ the camera driver does not know - this must be set manually or by script
 0 value image_type
 
+: add-observationXISF ( map --)
+\ add key value pairs for XISF camera parameters
+	>R
+ 	obs.type observationType	R@	=>" IMAGETYPE"
+   UUIDString make-UUID zcount				R@ =>" UUID"	\ generated UUID			
+	R> drop
+;
+
 : add-observationFITS ( map --)
 \ add key value pairs for FITS observation parameters
 	>R
@@ -21,7 +29,7 @@ TSlength buffer: TSstring
 	TSstring 1 timestamp			R@ =>" LOCAL-DT"		\ local date and time in ISO format
 	TSstring 3 timestamp drop 10	R@ =>" NIGHTOF"	\ local date in midday to midday format
  	obs.observer					R@ =>" OBSERVER"			
- 	UUIDString make-UUID 		R@ =>" UUID"			\ generated UUID									
+ 	UUIDString zcount 		R@ =>" UUID"			\ requires that add-observationXISF has been called first									
 	R> drop
 ;	
 
@@ -37,12 +45,3 @@ TSlength buffer: TSstring
 	R> drop
 ;	
 
-: add-observationXISF ( map --)
-\ add key value pairs for XISF camera parameters
-	>R
- 	obs.type observationType	R@	=>" IMAGETYPE"
-   UUIDString zcount				R@ =>" UUID"				\ requires that add-observationFITS has been called first
-	R> drop
-;
-
-CR ." finished importing XISF_maps.f" CR

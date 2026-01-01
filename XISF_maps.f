@@ -14,7 +14,7 @@ TSlength buffer: TSstring
 \ add key value pairs for XISF camera parameters
 	>R
  	obs.type observationType	R@	=>" IMAGETYPE"
-   UUIDString make-UUID 		R@ =>" UUID"	\ generated UUID			
+   UUIDString zcount		 		R@ =>" UUID"	\ generated UUID			
 	R> drop
 ;
 
@@ -29,7 +29,7 @@ TSlength buffer: TSstring
 	TSstring 1 timestamp			R@ =>" LOCAL-DT"		\ local date and time in ISO format
 	TSstring 3 timestamp drop 10	R@ =>" NIGHTOF"	\ local date in midday to midday format
  	obs.observer					R@ =>" OBSERVER"			
- 	UUIDString zcount 		R@ =>" UUID"			\ requires that add-observationXISF has been called first									
+ 	UUIDString make-UUID			R@ =>" UUID"			\ requires that add-observationXISF has been called first									
 	R> drop
 ;	
 

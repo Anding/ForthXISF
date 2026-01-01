@@ -1,6 +1,6 @@
 \ prepare a filepath with filename for an XISF file
 
-: default_write-filepath_buffer { map buf -- }									\ VFX locals
+: default_write-XISFfilepath_buffer { map buf -- }									\ VFX locals
 \ map is a completed FITSKEY map that will interrogated to create the filename
 \ buf may point to IMAGE_DESCRIPTOR..FILEPATH_BUFFER to complete the XISF structure
 \ 
@@ -25,6 +25,21 @@
 	s" .xisf" buf write-buffer drop
 ;
 
-	ASSIGN default_write-filepath_buffer TO-DO write-filepath_buffer		\ VFX state-smart alternatives to IS
+	ASSIGN default_write-XISFfilepath_buffer TO-DO write-XISFfilepath_buffer		\ VFX state-smart alternatives to IS
 
+: default_write-FITSfilepath_buffer { map buf -- }									\ VFX locals
+\ map is a completed FITSKEY map that will interrogated to create the filename
+\ buf may point to IMAGE_DESCRIPTOR..FILEPATH_BUFFER to complete the XISF structure
+\ 
+	\ directory
+	s" e:\images\ASTAP\" buf write-buffer drop
 	
+	buf buffer-punctuate-filepath
+	
+	\ filename
+	s" UUID" map >string drop 24 + 12 buf write-buffer drop
+	s" .fits" buf write-buffer drop
+;
+
+	ASSIGN default_write-FITSfilepath_buffer TO-DO write-FITSfilepath_buffer
+		

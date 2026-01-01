@@ -1,8 +1,5 @@
 \ test for XISF_map
 
-include "%idir%\..\forthbase\libraries\libraries.f"
-NEED forthbase
-NEED forth-map
 NEED windows
 
 include "%idir%\properties_obs.f"

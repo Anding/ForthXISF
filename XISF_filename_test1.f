@@ -1,11 +1,6 @@
 \ test XISF_filename.f
-include "%idir%\..\ForthBase\libraries\libraries.f"
-NEED forthbase
-NEED finitefractions
-NEED buffers
+
 NEED windows
-NEED forth-map
-NEED ForthXML
 
 include "%idir%\XISF.f"
 include "%idir%\XISF_filename.f"
@@ -28,14 +23,16 @@ TSlength buffer: TSstring
 		s" Crab_Nebula"					map1 =>" OBJECT"
 	map1 .map CR
 	img1 initialize-XISFfilepath
-	img1 FILEPATH_BUFFER buffer-to-string type CR
+	img1 XISF_FILEPATH_BUFFER buffer-to-string type CR
 
 		s" Flat"							map1 =>" IMAGETYP"
 		0 0								map1 =>" OBJECT"	
 	map1 .map CR
 	img1 initialize-XISFfilepath
-	img1 FILEPATH_BUFFER buffer-to-string type CR	
-	
+	img1 XISF_FILEPATH_BUFFER buffer-to-string type CR	
+
+	img1 initialize-FITSfilepath
+	img1 FITS_FILEPATH_BUFFER buffer-to-string type CR		
 
 	img1 free-image
 	

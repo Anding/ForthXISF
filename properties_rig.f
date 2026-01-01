@@ -7,9 +7,9 @@
 \ TELESCOP – user-entered information about the telescope used.
 \ SWCREATE - software
 
-0 value rig.aperature_dia
-0 value rig.aperature_area
-0 value rig.focal_len
-
+s" " $value rig.aperature_dia
+s" " $value rig.aperature_area
+s" " $value rig.focal_len
+s" " $value rig.focal_ratio
 s"  " $value rig.telescope
 s" github.com/Anding/Ptolemy" $value rig.software

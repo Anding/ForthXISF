@@ -21,14 +21,14 @@ TSlength buffer: TSstring
 : add-observationFITS ( map --)
 \ add key value pairs for FITS observation parameters
 	>R
-	s"  " 							R@ =>" #OBS"			\ a header to indicate the source of these FITS values	
+	s"  " 										R@ =>" #OBS"			\ a header to indicate the source of these FITS values	
  	obs.type observationType	R@ =>" IMAGETYP"	
  	obs.type LIGHT = if obs.object else 0 0 then
- 										R@ =>" OBJECT"
+ 														R@ =>" OBJECT"
 	TSstring 0 timestamp			R@ =>" DATE-OBS"		\ UTC date and time in ISO format
 	TSstring 1 timestamp			R@ =>" LOCAL-DT"		\ local date and time in ISO format
 	TSstring 3 timestamp drop 10	R@ =>" NIGHTOF"	\ local date in midday to midday format
- 	obs.observer					R@ =>" OBSERVER"			
+ 	obs.observer							R@ =>" OBSERVER"			
  	UUIDString make-UUID			R@ =>" UUID"			\ requires that add-observationXISF has been called first									
 	R> drop
 ;	
@@ -36,12 +36,13 @@ TSlength buffer: TSstring
 : add-rigFITS ( map --)
 \ add key value pairs for FITS rig parameters
 	>R
-	s"  " 							R@ =>" #RIG"			\ a header to indicate the source of these FITS values	
-	rig.telescope					R@ =>" TELESCOP"
-	rig.focal_len (.)				R@ =>" FOCALLEN"		
-	rig.aperature_dia (.)		R@ =>" APTDIA"			
-	rig.aperature_area (.)		R@ =>" APTAREA"
-	rig.software					R@ =>" SWCREATE"		
+	s"  " 									R@ =>" #RIG"			\ a header to indicate the source of these FITS values	
+	rig.telescope						R@ =>" TELESCOP"
+	rig.focal_len 					R@ =>" FOCALLEN"	
+	rig.focal_ratio					R@ =>" FOCRATIO"	
+	rig.aperature_dia 			R@ =>" APTDIA"			
+	rig.aperature_area 			R@ =>" APTAREA"
+	rig.software						R@ =>" SWCREATE"		
 	R> drop
 ;	
 

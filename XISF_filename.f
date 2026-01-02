@@ -8,19 +8,23 @@
 	s" e:\images\" buf write-buffer drop
 	s" NIGHTOF" map >string buf write-buffer drop 
 	'\' buf echo-buffer drop
-	s" OBJECT" map >string nip 0 = if
-		s" IMAGETYP" map >string buf write-buffer drop 
-	else
-		s" OBJECT" map >string buf write-buffer drop 
-	then
+	s" IMAGETYP" map >string buf write-buffer drop 
 	'\' buf echo-buffer drop
 	
 	buf buffer-punctuate-filepath
+	
 	\ filename
 	s" FILTER" map >string buf write-buffer drop 
-	s" -F" buf write-buffer drop
+	'-' buf echo-buffer drop	
+	
+	'E' buf echo-buffer drop	
+	s" EXPTIME" map >string buf write-buffer drop
+	'-' buf echo-buffer drop		
+	
+	'F' buf echo-buffer drop
 	s" FOCUSPOS" map >string buf write-buffer drop 
 	'-' buf echo-buffer drop
+	
 	s" UUID" map >string drop 24 + 12 buf write-buffer drop
 	s" .xisf" buf write-buffer drop
 ;
@@ -34,11 +38,24 @@
 	\ directory
 	s" e:\images\" buf write-buffer drop
 	s" NIGHTOF" map >string buf write-buffer drop 
-	s" \ASTAP\" buf write-buffer drop 
+	'\' buf echo-buffer drop
+	s" IMAGETYP" map >string buf write-buffer drop 
+	'\' buf echo-buffer drop
 	
 	buf buffer-punctuate-filepath
 	
 	\ filename
+	s" FILTER" map >string buf write-buffer drop 
+	'-' buf echo-buffer drop	
+	
+	'E' buf echo-buffer drop	
+	s" EXPTIME" map >string buf write-buffer drop
+	'-' buf echo-buffer drop		
+	
+	'F' buf echo-buffer drop
+	s" FOCUSPOS" map >string buf write-buffer drop 
+	'-' buf echo-buffer drop
+	
 	s" UUID" map >string drop 24 + 12 buf write-buffer drop
 	s" .fits" buf write-buffer drop
 ;

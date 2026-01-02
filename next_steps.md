@@ -1,12 +1,14 @@
-XISF next steps
-===============
+## ForthXISF next steps
 
-Additional properties to store in XISF image:
+1. save files in .png or other format for view in a browser
 
-1. offset (obtan from camera properties)
-2. Image type (FLAT, DARK, etc.)
-3. SSID
+2. implement some simple transformations
 
-Possible extensions:
+2a. integer binning
 
-1. Import XISF file (baseline only) to image buffer
+2b. abberation inspector
+
+3. create a local broswer webpage to display the images
+
+Perhaps this may be in another repository but which knows the XISF image descriptor (i.e. NEED XISF.f)
+Copilot will be a big help with this

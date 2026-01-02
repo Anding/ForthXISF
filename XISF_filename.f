@@ -32,7 +32,9 @@
 \ buf may point to IMAGE_DESCRIPTOR..FILEPATH_BUFFER to complete the XISF structure
 \ 
 	\ directory
-	s" e:\images\ASTAP\" buf write-buffer drop
+	s" e:\images\" buf write-buffer drop
+	s" NIGHTOF" map >string buf write-buffer drop 
+	s" \ASTAP\" buf write-buffer drop 
 	
 	buf buffer-punctuate-filepath
 	

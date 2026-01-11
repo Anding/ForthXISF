@@ -1,13 +1,11 @@
 #pragma once
+#define _CRT_SECURE_NO_WARNINGS 
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <stdint.h>
 
-#ifdef XISF_EXPORTS
-	#define XISF_API __declspec(dllexport)
-#else
-	#define XISF_API __declspec(dllimport)
-#endif
+// Always export - this DLL is only built, never imported in the same project
+#define XISF_API __declspec(dllexport)
 
 #ifdef __cplusplus
 extern "C" {

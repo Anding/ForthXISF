@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="XISF_project.vcxproj" Id="5b9dfee0-3e45-425b-a2fd-8932a6a0a1d3" />
+</Solution>

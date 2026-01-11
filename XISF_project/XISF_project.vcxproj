@@ -22,7 +22,8 @@
     <VCProjectVersion>18.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{5b9dfee0-3e45-425b-a2fd-8932a6a0a1d3}</ProjectGuid>
-    <RootNamespace>XISFproject</RootNamespace><TargetName>XISF</TargetName>
+    <RootNamespace>XISFproject</RootNamespace>
+    <TargetName>XISF</TargetName>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -135,6 +136,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\stb\stb_image_write.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="XISF.h" />
   </ItemGroup>

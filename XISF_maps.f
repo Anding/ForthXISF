@@ -44,7 +44,7 @@ TSlength buffer: xisf.TSstring
 \ add key value pairs for XISF camera parameters
 	>R
  	obs.type observationType                R@ =>" IMAGETYPE"
-    xiaf.UUIDString UUIDlength              R@ =>" UUID"            \ requires that add-observationFITS has been called first			
+    xisf.UUIDString UUIDlength              R@ =>" UUID"            \ requires that add-observationFITS has been called first			
 	R> drop
 ;
 

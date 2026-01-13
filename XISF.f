@@ -8,8 +8,8 @@ NEED buffers
 NEED forth-map
 NEED ForthXML
 
-256	constant FILEPATH_SIZE
-8192	constant XISF_HEADER_SIZE
+256   constant FILEPATH_SIZE
+8192  constant XISF_HEADER_SIZE
 11520 constant FITS_HEADER_SIZE	\ enough for 144 80-column cards, being 4 x 2880
 
 \ descriptor data structure for an image

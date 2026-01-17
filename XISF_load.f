@@ -17,16 +17,72 @@ NEED ForthXISF
 ;
 
 : xisf.scan-for-geometry ( buf -- width height depth )
-\ scan a newly opened XISF file and return the XISF geometry
+\ scan an xisf header in a buffer and return the XISF geometry
+\ return 0 0 0 if the geometry tag is not found
+\ close the buffer before return
     >R R@ buffer-reset-search
-    ( geometry="[^"]*") s\" geometry=\"[^\"]*\"" 
-    R> buffer-match ( c-addrM uM -1 | 0)
-    0= if ." Failed to find geometry tag" exit then
+    ( geometry="~"*") s\" geometry=\"~\"*\"" 
+    R@ buffer-match ( c-addrM uM -1 | 0)
+    R> free-buffer
+    0= if 0 0 0 exit then
     10 /string 1-       \ remove geometry=" and the closing "
     >number~~~
 ;
 
+: xisf.read-file { fileid img -- img }
+\ read an opened file into an instantiated image buffer
+\ close the file before returning
+    0 0 fileid reposition-file drop
+    img XISF_HEADER	( addr) img image_size XISF_HEADER_SIZE + ( addr n ) fileid read-file
+    2drop
+    fileid close-file drop
+    img
+;
 
-s" E:\coding\ForthXISF\XISF_test1.xisf" xisf.open-file
+
+: xisf.scan-for-fits ( img -- )
+\ scan an xisf header in an image and instantiate the fits map
+    >R
+    map ( forth-map) R@ FITS_map !          \ move this to allocate-image
+    R@ XISF_BUFFER buffer-reset-search    
+    begin
+        s\" <FITSKeyword" R@ XISF_BUFFER buffer-match
+    while
+        2drop
+        s\" name=\"~\"*\"" R@ XISF_BUFFER buffer-match 
+        if
+            6 /string 1-                    ( caddr n)   
+            s\" value=\"~\"*\"" R@ XISF_BUFFER buffer-match   
+            if 
+                7 /string 1-                ( caddr n caddr n)     
+                2swap R@ FITS_map @ ( caddrV nV caddrK nK map) =>   
+            then      
+         then         
+    repeat
+    R> drop
+;
+
+: xisf.load-file ( caddr u | fileid buf img  -- img 0 | IOR )
+\ allocate an image buffer and load an XISF file 
+    xisf.open-file if exit then     ( fileid buf)
+    xisf.scan-for-geometry          ( fileid width height depth) 
+    ?dup if 
+        allocate-image              ( fileid img)
+        xisf.read-file              ( img)
+        0
+    else
+        2drop
+        close-file drop
+        -1
+    then
+;
+       
+    
+s" E:\coding\ForthXISF\XISF_test1.xisf" xisf.load-file
+drop
+
+dup xisf.scan-for-fits
+
+
 
     

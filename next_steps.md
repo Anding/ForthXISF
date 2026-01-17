@@ -1,5 +1,8 @@
 ## ForthXISF next steps
 
+1. move the creation of the FITS file to allocate buffer
+2. dispense with the XISF buffer and move the necessary elements to he FITS map
+
 1. save files in .png or other format for view in a browser
 
 2. implement some simple transformations

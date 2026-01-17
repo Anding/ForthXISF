@@ -1,9 +1,6 @@
 \ Functionality to load XISF files
 \ limited to XISF files created in ForthXISF!
 
-NEED ForthXISF
-
-
 : xisf.open-file ( caddr u -- fileid buf 0 | IOR )
 \ open an XISF file and read the XISF header into buf
 \ leave the file pointer at the first byte past the header
@@ -29,24 +26,23 @@ NEED ForthXISF
     >number~~~
 ;
 
-: xisf.read-file { fileid img -- img }
-\ read an opened file into an instantiated image buffer
+: xisf.read-file { fileid img -- }
+\ read an opened file into an instantiated image structure
 \ close the file before returning
     0 0 fileid reposition-file drop
-    img XISF_HEADER	( addr) img image_size XISF_HEADER_SIZE + ( addr n ) fileid read-file
-    2drop
+    img XISF_BUFFER	( buf) XISF_HEADER_SIZE ( buf n ) fileid buffer-read-file 2drop
+    img IMAGE_BITMAP ( addr) img image_size ( addr n ) fileid read-file 2drop
     fileid close-file drop
-    img
 ;
 
 
-: xisf.scan-for-fits ( img -- )
+: xisf.scan-for-fits ( img --) 
 \ scan an xisf header in an image and instantiate the fits map
     >R
     map ( forth-map) R@ FITS_map !          \ move this to allocate-image
     R@ XISF_BUFFER buffer-reset-search    
     begin
-        s\" <FITSKeyword" R@ XISF_BUFFER buffer-match
+        s" <FITSKeyword" R@ XISF_BUFFER buffer-match
     while
         2drop
         s\" name=\"~\"*\"" R@ XISF_BUFFER buffer-match 
@@ -55,7 +51,8 @@ NEED ForthXISF
             s\" value=\"~\"*\"" R@ XISF_BUFFER buffer-match   
             if 
                 7 /string 1-                ( caddr n caddr n)     
-                2swap R@ FITS_map @ ( caddrV nV caddrK nK map) =>   
+                2swap R@ FITS_map @
+                ( caddrV nV caddrK nK map) =>   
             then      
          then         
     repeat
@@ -68,7 +65,9 @@ NEED ForthXISF
     xisf.scan-for-geometry          ( fileid width height depth) 
     ?dup if 
         allocate-image              ( fileid img)
+        dup -rot                    ( img fileid img)
         xisf.read-file              ( img)
+        dup xisf.scan-for-fits      ( img) 
         0
     else
         2drop
@@ -78,10 +77,8 @@ NEED ForthXISF
 ;
        
     
-s" E:\coding\ForthXISF\XISF_test1.xisf" xisf.load-file
-drop
 
-dup xisf.scan-for-fits
+
 
 
 

@@ -8,8 +8,7 @@ Tstart
 
 T{ 640 480 1 allocate-image CONSTANT img1 }T ==
 	
-	map CONSTANT map1
-	map1 img1 FITS_MAP !	
+	img1 FITS_MAP @ CONSTANT map1
 		s" T"	map1  =>" SIMPLE"
 		s" 16" map1 =>" BITPIX"	
 		s" 2"	map1 =>" NAXIS"	

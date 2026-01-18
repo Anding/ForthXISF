@@ -39,7 +39,6 @@
 : xisf.scan-for-fits ( img --) 
 \ scan an xisf header in an image and instantiate the fits map
     >R
-    map ( forth-map) R@ FITS_map !          \ move this to allocate-image
     R@ XISF_BUFFER buffer-reset-search    
     begin
         s" <FITSKeyword" R@ XISF_BUFFER buffer-match

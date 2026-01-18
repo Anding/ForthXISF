@@ -48,6 +48,8 @@ END-STRUCTURE
 	XISF_HEADER_SIZE R@ XISF_BUFFER ( size buf) declare-buffer
 	FITS_HEADER_SIZE R@ FITS_BUFFER ( size buf) declare-buffer
 	R@ IMAGE_BITMAP R@ IMAGE_SIZE_WITH_PAD @ erase		\ zero the image buffer including the pad
+	map ( forth-map) R@ FITS_map !
+	map ( forth-map) R@ XISF_map !	
 	R>
 ;
 

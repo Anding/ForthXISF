@@ -20,7 +20,6 @@ BEGIN-STRUCTURE IMAGE_DESCRIPTOR
 					4	+FIELD IMAGE_SIZE_BYTES			\ image size in bytes
 					4  +FIELD IMAGE_SIZE_WITH_PAD		\ image size after padding to 2880 boundary for FITS
 					4 	+FIELD FITS_MAP					\ pointer to the key-value FITS map
-					4	+FIELD XISF_MAP					\ pointer to the key-value XISF map	
 BUFFER_DESCRIPTOR +FIELD XISF_FILEPATH_BUFFER	\ descriptor to the XISF filepath with filename buffer
 FILEPATH_SIZE		+FIELD XISF_FILEPATH				\ XISF filepath with filename, as a buffer
 BUFFER_DESCRIPTOR +FIELD FITS_FILEPATH_BUFFER	\ descriptor to the XISF filepath with filename buffer
@@ -49,7 +48,6 @@ END-STRUCTURE
 	FITS_HEADER_SIZE R@ FITS_BUFFER ( size buf) declare-buffer
 	R@ IMAGE_BITMAP R@ IMAGE_SIZE_WITH_PAD @ erase		\ zero the image buffer including the pad
 	map ( forth-map) R@ FITS_map !
-	map ( forth-map) R@ XISF_map !	
 	R>
 ;
 
@@ -125,11 +123,11 @@ END-STRUCTURE
 		s" geometry"
 			2R@ drop IMAGE_WIDTH @ 2R@ drop IMAGE_HEIGHT @ 2R@ drop IMAGE_DEPTH @
 			~~~$	( finite fractions utility) R@ xml.keyval
-		s" sampleFormat" s" UInt16" R@ xml.keyval
-		s" colorSpace" s" Gray" R@ xml.keyval
-		s" offset"  s" OFFSET" 2R@ drop XISF_MAP @ >string R@ xml.keyval
-		s" imageType" s" IMAGETYPE" 2R@ drop XISF_MAP @ >string R@ xml.keyval
-		s" uuid" s" UUID" 2R@ drop XISF_MAP @ >string R@ xml.keyval
+		s" sampleFormat"  s" SMPLFRMT" 2R@ drop FITS_MAP @ >string R@ xml.keyval
+		s" colorSpace" s" COLORSPC" 2R@ drop FITS_MAP @ >string R@ xml.keyval		
+		s" offset"  s" OFFSET" 2R@ drop FITS_MAP @ >string R@ xml.keyval
+		s" imageType" s" IMAGETYP" 2R@ drop FITS_MAP @ >string R@ xml.keyval
+		s" uuid" s" UUID" 2R@ drop FITS_MAP @ >string R@ xml.keyval
 		s" location" s" attachment:" R@ xml.keyval
 			XISF_HEADER_SIZE 0 <# #s #> R@ xml.append s" :" R@ xml.append
 			2R@ drop image_size 0 <# #s #> R@ xml.append

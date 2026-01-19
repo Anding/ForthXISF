@@ -1,6 +1,5 @@
 ## ForthXISF next steps
 
-1. dispense with the XISF map and move the necessary elements to he FITS map
 
 ## save-png next steps
 

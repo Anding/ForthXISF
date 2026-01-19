@@ -14,15 +14,11 @@ T{ 640 480 1 allocate-image CONSTANT img1 }T ==
 		s" SXV-H9" map1 =>" INSTRUMENT" 
 		s" 23:30:35" map1 =>" TIME-OBS" 
 		s" ff11238a23a4" map1 =>" UUID"
-
-	
-	map CONSTANT map2
-	map2 img1 XISF_MAP !	
-		s" UInt16" map2 =>" sampleFormat" 
-		s" Gray" map2 =>" colorSpace" 
-		s" Light" map2 =>" imageType" 
-		s" -50" map2 =>" offset" 
-		s" ff11238a23a4" map2 =>" uuid" 
+		s" UInt16" map1 =>" SMPLFRMT" 
+		s" Gray" map1 =>" COLORSPC" 
+		s" Light" map1 =>" IMAGETYP" 
+		s" -50" map1 =>" OFFSET" 
+		s" ff11238a23a4" map1 =>" UUID" 
 	
 : test_write-XISFfilepath_buffer ( map buf -- )
 	>R drop

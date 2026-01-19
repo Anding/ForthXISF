@@ -40,7 +40,7 @@ T{ img1 FITS_FILEPATH_BUFFER create-imageDirectory }T ==
 T{ img1 save-FITSimage }T ==
 T{	img1 free-image }T ==
 
-\ serialize XISF_test1.xisf and the reference file to buffers
+\ serialize XISF_test1.fitsand the reference file to buffers
 	s" %idir%\FITS_test1.fits" r/o open-file drop
 	constant fileid1
 	fileid1 file-to-buffer

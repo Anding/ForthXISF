@@ -32,3 +32,16 @@ END-ENUMS
 
 s"  " $value obs.object
 s"  " $value obs.observer
+
+: frames	( n --)
+\ set the bias, dark, flat, light frame type
+	-> obs.type
+;
+
+: frames? ( --)
+	obs.type observationType
+;
+
+: object ( caddr u --)
+	$-> obs.object
+;

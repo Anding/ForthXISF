@@ -3,14 +3,10 @@
 
 need Windows
 
-UUIDlength buffer: xisf.UUIDstring  
 TSlength buffer: xisf.TSstring
-
 
 \ the camera driver does not know - this must be set manually or by script
 0 value image_type
-
-
 
 : add-observationFITS ( map --)
 \ add key value pairs for FITS observation parameters
@@ -23,7 +19,7 @@ TSlength buffer: xisf.TSstring
 	xisf.TSstring 1 make-timestamp          R@ =>" LOCAL-DT"        \ local date and time in ISO format
 	xisf.TSstring 3 make-timestamp drop 10  R@ =>" NIGHTOF"         \ local date in midday to midday format
  	obs.observer                            R@ =>" OBSERVER"			
- 	xisf.UUIDString make-UUID               R@ =>" UUID"											
+ 	UUID                                    R@ =>" UUID"											
 	R> drop
 ;	
 
@@ -39,5 +35,3 @@ TSlength buffer: xisf.TSstring
 	rig.software                            R@ =>" SWCREATE"		
 	R> drop
 ;	
-
-

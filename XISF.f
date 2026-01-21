@@ -155,9 +155,8 @@ END-STRUCTURE
 	then 
 ;
 
-
-DEFER write-XISFfilepath_buffer ( map buf --)
-DEFER write-FITSfilepath_buffer ( map buf --)
+DEFER write-XISFfilepath ( map buf --)
+DEFER write-FITSfilepath ( map buf --)
 \ map is a completed FITSKEY map that will interrogated to create the filename
 \ buf points to IMAGE_DESCRIPTOR..FILEPATH_BUFFER 
 
@@ -168,7 +167,7 @@ DEFER write-FITSfilepath_buffer ( map buf --)
 	R@ FITS_MAP @ ( map)
 	R> XISF_FILEPATH_BUFFER
 	FILEPATH_SIZE over ( map buf FILEPATH_SIZE buf) declare-buffer
-	( map buf) write-XISFfilepath_buffer
+	( map buf) write-XISFfilepath
 ;
 
 : initialize-FITSfilepath ( img --)
@@ -178,7 +177,7 @@ DEFER write-FITSfilepath_buffer ( map buf --)
 	R@ FITS_MAP @ ( map)
 	R> FITS_FILEPATH_BUFFER
 	FILEPATH_SIZE over ( map buf FILEPATH_SIZE buf) declare-buffer
-	( map buf) write-FITSfilepath_buffer
+	( map buf) write-FITSfilepath
 ;
 
 : create-imageDirectory ( FILEPATH_BUFFER --)
@@ -220,3 +219,4 @@ DEFER write-FITSfilepath_buffer ( map buf --)
 	img IMAGE_BITMAP img IMAGE_SIZE_WITH_PAD @ ( addr u ) fileid write-file abort" Cannot access FITS file"	
 	fileid close-file abort" Cannot close FITS file"
 ;
+

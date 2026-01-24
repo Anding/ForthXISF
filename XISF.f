@@ -78,12 +78,13 @@ END-STRUCTURE
 \ c-addr u is each key as a string
 \ output format: FOCUSPOS= '2000'  ...padded to 80 charaters
 	>R rot R> swap >R									( c-addr u map R:buf)
-	\ write the FITS key, limiting to 8 characters
-	-rot 8 min 2dup R@ write-buffer drop				( map c-addr u R:buf)
+	\ write the FITS key, skipping any malformed keys with >8 characters
+	-rot dup 8 > if 2drop drop R> ( buf) exit then      ( map c-addr u R:buf)
+	2dup R@ write-buffer drop				            ( map c-addr u R:buf)
 	\ pad with spaces to 8 characters
 	dup 8 swap ?do bl j ( do loop hides R@) echo-buffer drop loop
-	\ write = '
-	s" = " R@ write-buffer drop					( map c-addr u R:buf)
+	\ write = 
+	s" = " R@ write-buffer drop                         ( map c-addr u R:buf)
 	\ obtain the value from the key and write it
 	rot >string											( caddr u R:buf)
 	2dup R@ write-buffer drop
@@ -92,7 +93,7 @@ END-STRUCTURE
 	\ 1234567890
 	dup 70 swap ?do bl j ( do loop hides R@) echo-buffer drop loop
 	2drop
-	R>														( buf)
+	R>                                                  ( buf)
 ;
 
 : XISF.write-map-XISF ( map buf --)
@@ -140,7 +141,7 @@ END-STRUCTURE
 ;	
 
 : initialize-FITSimage { img | buf -- }
-\ prepare the image in XISF format
+\ prepare the image in FITS format
 \ called by save-FITSimage
 	img FITS_BUFFER -> buf
 	buf reset-buffer
@@ -159,6 +160,16 @@ DEFER write-XISFfilepath ( map buf --)
 DEFER write-FITSfilepath ( map buf --)
 \ map is a completed FITSKEY map that will interrogated to create the filename
 \ buf points to IMAGE_DESCRIPTOR..FILEPATH_BUFFER 
+
+: initialize-image { img | map x y -- }
+   img FITS_MAP @ -> map
+   s" NAXIS1" map >integer -> x
+   s" NAXIS2" map >integer -> y
+   x img IMAGE_WIDTH !
+   y img IMAGE_HEIGHT !
+   x y * 2 * dup img IMAGE_SIZE_BYTES !
+   dup 2880 /mod drop ( rem) 2880 swap - +	img IMAGE_SIZE_WITH_PAD !
+;
 
 : initialize-XISFfilepath ( img --)
 \ prepare the filepath with filename for the XISF file
@@ -188,6 +199,7 @@ DEFER write-FITSfilepath ( map buf --)
 
 : save-XISFimage { img | fileid -- }		\ VFX locals
 \ save the image to an XISF file, the filename is created according to write-XISFfilepath_buffer 
+    img initialize-image 
 	img initialize-XISFimage
 	img initialize-XISFfilepath
 	img XISF_FILEPATH_BUFFER create-imageDirectory
@@ -202,6 +214,7 @@ DEFER write-FITSfilepath ( map buf --)
 : save-FITSimage { img | fileid -- }		\ VFX locals
 \ save the image to an FITS file, the filename is created according to write-FITSfilepath_buffer
 \ save-FITSimage reverses the image bytes in memory to big-endian format so must be called AFTER save-XISF image
+    img initialize-image 
 	img initialize-FITSimage
 	img initialize-FITSfilepath
 	img FITS_FILEPATH_BUFFER create-imageDirectory

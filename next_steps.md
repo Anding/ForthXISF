@@ -1,6 +1,8 @@
 ## ForthXISF next steps
 
-1. create a new buffer for the big-endian FITS image file
+1. dynamically allocate a buffer for the big-endian FITS image file
+
+2. write an an optimized assembly language routine for the big <> little endian conversion
 
 ## save-png next steps
 

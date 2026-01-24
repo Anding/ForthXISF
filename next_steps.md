@@ -1,5 +1,6 @@
 ## ForthXISF next steps
 
+1. create a new buffer for the big-endian FITS image file
 
 ## save-png next steps
 

@@ -224,7 +224,7 @@ DEFER write-FITSfilepath ( map buf --)
 	fileid close-file abort" Cannot close XISF file"
 ;
 
-: save-FITSimage { img | fileid -- }		\ VFX locals
+: save-FITSimage { img | fileid FITSbuffer -- }		\ VFX locals
 \ save the image to an FITS file, the filename is created according to write-FITSfilepath_buffer
 \ save-FITSimage reverses the image bytes in memory to big-endian format so must be called AFTER save-XISF image
     img initialize-image 
@@ -234,15 +234,11 @@ DEFER write-FITSfilepath ( map buf --)
 	img FITS_FILEPATH_BUFFER buffer-to-string w/o 
 		create-file abort" Cannot create FITS file" -> fileid
 	img FITS_BUFFER fileid buffer-to-file
-	img IMAGE_BITMAP dup img IMAGE_SIZE_WITH_PAD @ + swap
-	do 
-		\ reverse 16 bit words in big-endian format
-		i c@ 
-		i 1+ c@
-		i c!
-		i 1+ c!
-	2 +loop
-	img IMAGE_BITMAP img IMAGE_SIZE_WITH_PAD @ ( addr u ) fileid write-file abort" Cannot access FITS file"	
+	img IMAGE_SIZE_WITH_PAD @ allocate abort" unable to allocate image" -> FITSbuffer
+	img IMAGE_BITMAP FITSbuffer img IMAGE_SIZE_WITH_PAD @ moveReverseEndian 
+	FITSbuffer img IMAGE_SIZE_WITH_PAD @ ( addr u ) fileid write-file abort" Cannot access FITS file"	
+	FITSbuffer free drop
 	fileid close-file abort" Cannot close FITS file"
+	
 ;
 

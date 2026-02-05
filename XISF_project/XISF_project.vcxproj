@@ -148,6 +148,9 @@
     <ClCompile Include="dllmain.c" />
     <ClCompile Include="xisf_png.c" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="ReverseEndian.asm" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

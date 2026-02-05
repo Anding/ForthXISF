@@ -14,21 +14,21 @@ NEED ForthXML
 
 \ descriptor data structure for an image
 BEGIN-STRUCTURE IMAGE_DESCRIPTOR
-					4 	+FIELD IMAGE_WIDTH				\ width in pixels
-					4 	+FIELD IMAGE_HEIGHT				\ height in pixels
-					4 	+FIELD IMAGE_DEPTH				\ depth in bitplanes
-					4	+FIELD IMAGE_SIZE_BYTES			\ image size in bytes
-					4  +FIELD IMAGE_SIZE_WITH_PAD		\ image size after padding to 2880 boundary for FITS
-					4 	+FIELD FITS_MAP					\ pointer to the key-value FITS map
-BUFFER_DESCRIPTOR +FIELD XISF_FILEPATH_BUFFER	\ descriptor to the XISF filepath with filename buffer
-FILEPATH_SIZE		+FIELD XISF_FILEPATH				\ XISF filepath with filename, as a buffer
-BUFFER_DESCRIPTOR +FIELD FITS_FILEPATH_BUFFER	\ descriptor to the XISF filepath with filename buffer
-FILEPATH_SIZE		+FIELD FITS_FILEPATH				\ XISF filepath with filename, as a buffer				 			 
-BUFFER_DESCRIPTOR +FIELD FITS_BUFFER				\ descriptor to the FITS header buffer
-FITS_HEADER_SIZE	+FIELD FITS_HEADER				\ FITS header buffer immediately follows the descriptor
-BUFFER_DESCRIPTOR +FIELD XISF_BUFFER				\ descriptor to the XISF header buffer
-XISF_HEADER_SIZE	+FIELD XISF_HEADER				\ XISF header buffer immediately follows the descriptor
-					0 	+FIELD IMAGE_BITMAP				\ image bitmap immediately follows the XISF header
+                4   +FIELD IMAGE_WIDTH				\ width in pixels
+                4   +FIELD IMAGE_HEIGHT				\ height in pixels
+                4   +FIELD IMAGE_DEPTH				\ depth in bitplane
+                4   +FIELD IMAGE_SIZE_BYTES			\ image size in bytes
+                4   +FIELD IMAGE_SIZE_WITH_PAD		\ image size after padding to 2880 boundary for FITS
+                4   +FIELD FITS_MAP					\ pointer to the key-value FITS map
+BUFFER_DESCRIPTOR   +FIELD XISF_FILEPATH_BUFFER	\ descriptor to the XISF filepath with filename buffer
+FILEPATH_SIZE       +FIELD XISF_FILEPATH				\ XISF filepath with filename, as a buffer
+BUFFER_DESCRIPTOR   +FIELD FITS_FILEPATH_BUFFER	\ descriptor to the XISF filepath with filename buffer
+FILEPATH_SIZE       +FIELD FITS_FILEPATH				\ XISF filepath with filename, as a buffer				 			 
+BUFFER_DESCRIPTOR   +FIELD FITS_BUFFER				\ descriptor to the FITS header buffer
+FITS_HEADER_SIZE    +FIELD FITS_HEADER				\ FITS header buffer immediately follows the descriptor
+BUFFER_DESCRIPTOR   +FIELD XISF_BUFFER				\ descriptor to the XISF header buffer
+XISF_HEADER_SIZE    +FIELD XISF_HEADER				\ XISF header buffer immediately follows the descriptor
+				0 	+FIELD IMAGE_BITMAP				\ image bitmap immediately follows the XISF header
 END-STRUCTURE
 
 : allocate-image  ( width height depth -- img )
@@ -155,6 +155,19 @@ END-STRUCTURE
 		2880 swap ?do bl buf echo-buffer drop loop
 	then 
 ;
+
+: moveReverseEndian ( src dst n  -- )
+\ move n bytes from src dst, reversing the endian as 16 bit words
+    0 do
+        over w@
+        twist2
+        over w!
+        2 + swap
+        2 + swap
+    2 +loop
+    2drop
+;
+    
 
 DEFER write-XISFfilepath ( map buf --)
 DEFER write-FITSfilepath ( map buf --)

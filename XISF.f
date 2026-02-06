@@ -212,7 +212,6 @@ DEFER write-FITSfilepath ( map buf --)
 
 : save-XISFimage { img | fileid -- }		\ VFX locals
 \ save the image to an XISF file, the filename is created according to write-XISFfilepath_buffer 
-    img initialize-image 
 	img initialize-XISFimage
 	img initialize-XISFfilepath
 	img XISF_FILEPATH_BUFFER create-imageDirectory
@@ -227,7 +226,6 @@ DEFER write-FITSfilepath ( map buf --)
 : save-FITSimage { img | fileid FITSbuffer -- }		\ VFX locals
 \ save the image to an FITS file, the filename is created according to write-FITSfilepath_buffer
 \ save-FITSimage reverses the image bytes in memory to big-endian format so must be called AFTER save-XISF image
-    img initialize-image 
 	img initialize-FITSimage
 	img initialize-FITSfilepath
 	img FITS_FILEPATH_BUFFER create-imageDirectory

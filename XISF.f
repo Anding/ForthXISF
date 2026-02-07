@@ -156,10 +156,11 @@ END-STRUCTURE
 	then 
 ;
 
-: moveReverseEndian ( src dst n  -- )
+: convertDataFITS ( src dst n  -- )
 \ move n bytes from src dst, reversing the endian as 16 bit words
     0 do
         over w@
+        32768 -     \ camera returns [0, 65535] ; FITS format [-32768, 32767]
         twist2
         over w!
         2 + swap
@@ -233,7 +234,7 @@ DEFER write-FITSfilepath ( map buf --)
 		create-file abort" Cannot create FITS file" -> fileid
 	img FITS_BUFFER fileid buffer-to-file
 	img IMAGE_SIZE_WITH_PAD @ allocate abort" unable to allocate image" -> FITSbuffer
-	img IMAGE_BITMAP FITSbuffer img IMAGE_SIZE_WITH_PAD @ moveReverseEndian 
+	img IMAGE_BITMAP FITSbuffer img IMAGE_SIZE_WITH_PAD @ convertDataFITS 
 	FITSbuffer img IMAGE_SIZE_WITH_PAD @ ( addr u ) fileid write-file abort" Cannot access FITS file"	
 	FITSbuffer free drop
 	fileid close-file abort" Cannot close FITS file"

@@ -156,18 +156,41 @@ END-STRUCTURE
 	then 
 ;
 
-: convertDataFITS ( src dst n  -- )
-\ move n bytes from src dst, reversing the endian as 16 bit words
-    0 do
-        over w@
-        32768 -     \ camera returns [0, 65535] ; FITS format [-32768, 32767]
-        twist2
-        over w!
-        2 + swap
-        2 + swap
-    2 +loop
-    2drop
-;
+CODE convertDataFITS ( src dst n  -- )
+    \ Load pointers: EDX = source, ECX = destination. EBX contains byte count.
+    mov     edx, 4 [ebp]        \ source pointer
+    mov     ecx, 0 [ebp]        \ destination pointer    
+    test    ebx, ebx            \ check if byte count is zero
+    jz      L$2
+L$1:
+    cmp     ebx, 2              \ check if at least 2 bytes remain
+    jb      L$2
+    movzx   eax, word 0 [edx]   \ load 16-bit word (zero-extended to 32 bits)
+    sub     ax, 32768           \ subtract 32768 (convert unsigned to signed range)
+    xchg    al, ah              \ swap bytes (endian reversal: little->big)
+    mov     word 0 [ecx], ax    \ store converted word
+    add     edx, 2              \ move source pointer forward 2 bytes
+    add     ecx, 2              \ move destination pointer forward 2 bytes
+    sub     ebx, 2              \ decrement byte counter by 2
+    jmp     L$1                 \ continue loop
+L$2:
+    mov ebx, 08 [ebp]           \ move the 3rd stack item to the cached TOS
+    lea ebp, 12 [ebp]           \ move the stack pointer up by 3 cells
+    NEXT,    
+END-CODE
+
+\ : convertDataFITS ( src dst n  -- )
+\ \ move n bytes from src dst, reversing the endian as 16 bit words
+\     0 do
+\         over w@
+\         32768 -     \ camera returns [0, 65535] ; FITS format [-32768, 32767]
+\         twist2
+\         over w!
+\         2 + swap
+\         2 + swap
+\     2 +loop
+\     2drop
+\ ;
     
 
 DEFER write-XISFfilepath ( map buf --)

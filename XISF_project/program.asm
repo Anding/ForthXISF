@@ -1,69 +1,42 @@
-; EBX wlll contain a number of bytes, n.  n%4=0, that is n is divisible by 4
-; [EBP} will conbtain the address of the destination
+; EBX will contain a number of bytes, n.  n%4=0, that is n is divisible by 4
+; [EBP] will contain the address of the destination
 ; [EBP+4] will contain the address of a source
-; EAX, ECX, EDX are scratch registers that do no need to be prserved
+; EAX, ECX, EDX are scratch registers that do not need to be preserved
 ; if other registers are used they must be preserved
 
-; write an x86 assemble language snippet to copy 16-bit words from source to destintion with an Endian reversal.  n bytes in total
-; it is permissable to use 32-bit reads and writes, but note the endian reversal must treat each 32-bit word as two separate 16-bit words
-; write the code for maxium performance on a latest generation x86 CPU
-
-; write the code in this file, please include comments to explain what you are doing
-
-section .data
-align 16
-byte_swap_mask:    ; indexes to swap bytes in each 16-bit word: 1,0,3,2,5,4,...
-    db 1,0,3,2,5,4,7,6,9,8,11,10,13,12,15,14
+; This code converts 16-bit unsigned words (0-65535) to signed words (-32768 to 32767)
+; and performs endian reversal from little-endian to big-endian format
+; Processing: subtract 32768, then swap bytes within each 16-bit word
 
 section .text
 global _start
 
 _start:
-    ; Load pointers (use EDX = src, ECX = dst). EBX already contains byte count.
+    ; Load pointers: EDX = source, ECX = destination. EBX contains byte count.
     mov     edx, [ebp+4]    ; source pointer
     mov     ecx, [ebp]      ; destination pointer
 
-    test    ebx, ebx
+    test    ebx, ebx        ; check if byte count is zero
     jz      .done
 
-    ; Load shuffle mask into XMM1 once (requires SSSE3)
-    movdqu  xmm1, [byte_swap_mask]
-
-.loop16:
-    cmp     ebx, 16
-    jb      .check8
-    movdqu  xmm0, [edx]     ; load 16 bytes from source
-    pshufb  xmm0, xmm1      ; swap bytes within each 16-bit word
-    movdqu  [ecx], xmm0     ; store 16 bytes to destination
-    add     edx, 16
-    add     ecx, 16
-    sub     ebx, 16
-    jmp     .loop16
-
-.check8:
-    cmp     ebx, 8
-    jb      .check4
-    movq    xmm0, [edx]     ; load low 8 bytes
-    pshufb  xmm0, xmm1      ; swap bytes within each 16-bit word (low 8 bytes indices 0..7 used)
-    movq    [ecx], xmm0     ; store low 8 bytes
-    add     edx, 8
-    add     ecx, 8
-    sub     ebx, 8
-
-.check4_loop:
-    cmp     ebx, 4
+.loop:
+    cmp     ebx, 2          ; check if at least 2 bytes remain
     jb      .done
-    mov     eax, [edx]      ; load 4 bytes (one 32-bit word = two 16-bit words)
-    bswap   eax             ; reverse full dword: b3 b2 b1 b0 -> b0 b1 b2 b3
-    ror     eax, 16         ; rotate to produce: b2 b3 b0 b1 (swap bytes inside each 16-bit word)
-    mov     [ecx], eax
-    add     edx, 4
-    add     ecx, 4
-    sub     ebx, 4
-    jmp     .check4_loop
+    
+    ; Process one 16-bit word
+    movzx   eax, word [edx]     ; load 16-bit word (zero-extended to 32 bits)
+    sub     ax, 32768           ; subtract 32768 (convert unsigned to signed range)
+    xchg    al, ah              ; swap bytes (endian reversal: little->big)
+    mov     word [ecx], ax      ; store converted word
+    
+    ; Advance pointers and decrement counter
+    add     edx, 2              ; move source pointer forward 2 bytes
+    add     ecx, 2              ; move destination pointer forward 2 bytes
+    sub     ebx, 2              ; decrement byte counter by 2
+    jmp     .loop               ; continue loop
 
 .done:
     ; Exit (Linux int 0x80 syscall)
-    mov     eax, 1          ; sys_exit
-    xor     ebx, ebx        ; status 0
+    mov     eax, 1              ; sys_exit
+    xor     ebx, ebx            ; status 0
     int     0x80

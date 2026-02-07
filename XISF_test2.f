@@ -28,6 +28,7 @@ T{ 640 480 1 allocate-image CONSTANT img1 }T ==
 	ASSIGN test_write-FITSfilepath TO-DO write-FITSfilepath
 	
 T{ img1 image_size }T 640 480 1 2* * * ==
+T{ img1 initialize-image }T ==
 T{ img1 initialize-FITSimage }T ==
 T{ img1 initialize-FITSfilepath }T ==
 cr img1 FITS_FILEPATH_BUFFER

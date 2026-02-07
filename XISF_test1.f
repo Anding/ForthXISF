@@ -1,7 +1,6 @@
 \ test for XISF.f
 NEED simple-tester
-
-include "%idir%\XISF.f"\
+NEED forthXISF
 
 CR
 Tstart
@@ -10,9 +9,8 @@ T{ 640 480 1 allocate-image CONSTANT img1 }T ==
 	
 	map CONSTANT map1
 	map1 img1 FITS_MAP !	
-		s" 2000" map1 =>" FOCUSPOS" 
-		s" SXV-H9" map1 =>" INSTRUMENT" 
-		s" 23:30:35" map1 =>" TIME-OBS" 
+		s" 640" map1 =>" NAXIS1" 
+		s" 480" map1 =>" NAXIS2" 
 		s" ff11238a23a4" map1 =>" UUID"
 		s" UInt16" map1 =>" SMPLFRMT" 
 		s" Gray" map1 =>" COLORSPC" 
@@ -20,16 +18,17 @@ T{ 640 480 1 allocate-image CONSTANT img1 }T ==
 		s" -50" map1 =>" OFFSET" 
 		s" ff11238a23a4" map1 =>" UUID" 
 	
-: test_write-XISFfilepath_buffer ( map buf -- )
+: test_write-XISFfilepath ( map buf -- )
 	>R drop
 	s" e:\coding\ForthXISF\" R@ write-buffer drop
 	R@ buffer-punctuate-filepath
 	s" XISF_test1.xisf" R@ write-buffer drop
 	R> drop
 ;
-	ASSIGN test_write-XISFfilepath_buffer TO-DO write-XISFfilepath_buffer	
+	ASSIGN test_write-XISFfilepath TO-DO write-XISFfilepath	
 	
 T{ img1 image_size }T 640 480 1 2* * * ==
+T{ img1 initialize-image }T ==
 T{ img1 initialize-XISFimage }T ==
 T{ img1 initialize-XISFfilepath }T ==
 cr img1 XISF_FILEPATH_BUFFER

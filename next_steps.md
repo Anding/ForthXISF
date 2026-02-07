@@ -1,8 +1,9 @@
 ## ForthXISF next steps
 
-1. dynamically allocate a buffer for the big-endian FITS image file
-
-2. write an an optimized assembly language routine for the big <> little endian conversion
+1. comply with FITS standards to place any values with non-numeric characters in ' '
+- the forth-map keys themselves should not contain quotation marks, for ease of processing
+- apply the quotation marks when saving the FITS file
+- remobe the quotations marks when creating a forth-map from FITS keys
 
 ## save-png next steps
 

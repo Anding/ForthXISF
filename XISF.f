@@ -85,8 +85,8 @@ END-STRUCTURE
 	dup 8 swap ?do bl j ( do loop hides R@) echo-buffer drop loop
 	\ write = 
 	s" = " R@ write-buffer drop                         ( map c-addr u R:buf)
-	\ obtain the value from the key and write it
-	rot >string											( caddr u R:buf)
+	\ obtain the value from the key and write it, limiting the value to 70 characters
+	rot >string 70 min									( caddr u R:buf)
 	2dup R@ write-buffer drop
 	\ pad with spaces to 80 characters (70 after the keywords and mandtaory characters)
 	\ KEYWORD = 

@@ -60,6 +60,44 @@ END-STRUCTURE
 	IMAGE_SIZE_BYTES @
 ;
 
+: initialize-image { img | map x y -- }
+   img FITS_MAP @ -> map
+   s" NAXIS1" map >integer -> x
+   s" NAXIS2" map >integer -> y
+   x img IMAGE_WIDTH !
+   y img IMAGE_HEIGHT !
+   x y * 2 * dup img IMAGE_SIZE_BYTES !
+   dup 2880 /mod drop ( rem) 2880 swap - +	img IMAGE_SIZE_WITH_PAD !
+;
+
+: IsFITSnumchar? ( c -- flag)
+\ check if a character is a valid FITS key numeric 
+   >R 0
+   R@ '+' = OR
+   R@ '-' = OR
+   R@ '.' = OR
+   R@ 'E' = OR
+   R@ 'e' = OR
+   R> '0' '9' within? OR
+; 
+
+s" " $value FITSstringBuf
+   
+: StrToFITSStr ( caddr u -- caddr u)
+\ convert a string to comply with FITS key requirements
+\ by enclosing any non-numeric in '
+ 2dup -1 -rot ( caddr u flag caddr u) over + swap do i c@ IsFITSnumchar? and dup 0= if leave then loop 
+ 0= if  \ the file contained a non FITSnumeric character, so copy it over with enclosing ' ' 
+    s" '" $-> FITSstringBuf $+> FITSstringBuf s" '" $+> FITSstringBuf FITSstringBuf  
+ then
+;
+
+: FITSstrToStr ( caddr u -- caddr u)
+\ convert a key in FITS string format
+\ by eliminating any enclosing '
+    over c@ ''' = if 2 - swap 1 + swap then
+; 
+
 : XISF.mapIterXISF ( buf c-addr u map -- buf)
 \ forth-map iterator
 \ c-addr u is each key as a string
@@ -67,33 +105,10 @@ END-STRUCTURE
 	>R rot R> swap >R									( c-addr u map R:buf)
 	s" FITSKeyword" R@ xml.<tag	
 	-rot 2dup s" name" 2swap R@ xml.keyval 	( c-addr u map R:buf)
-	rot >string				      					( c-addr u R:buf)		
-	s" value" 2swap R@ xml.keyval					( R:buf)
+	rot >string StrToFITSStr				      	    ( c-addr u R:buf)		
+	s" value" 2swap R@ xml.keyval					    ( R:buf)
 	R@ xml./>
 	R>
-;
-
-: XISF.mapIterFITS ( buf c-addr u map -- buf)
-\ forth-map iterator
-\ c-addr u is each key as a string
-\ output format: FOCUSPOS= '2000'  ...padded to 80 charaters
-	>R rot R> swap >R									( c-addr u map R:buf)
-	\ write the FITS key, skipping any malformed keys with >8 characters
-	-rot dup 8 > if 2drop drop R> ( buf) exit then      ( map c-addr u R:buf)
-	2dup R@ write-buffer drop				            ( map c-addr u R:buf)
-	\ pad with spaces to 8 characters
-	dup 8 swap ?do bl j ( do loop hides R@) echo-buffer drop loop
-	\ write = 
-	s" = " R@ write-buffer drop                         ( map c-addr u R:buf)
-	\ obtain the value from the key and write it, limiting the value to 70 characters
-	rot >string 70 min									( caddr u R:buf)
-	2dup R@ write-buffer drop
-	\ pad with spaces to 80 characters (70 after the keywords and mandtaory characters)
-	\ KEYWORD = 
-	\ 1234567890
-	dup 70 swap ?do bl j ( do loop hides R@) echo-buffer drop loop
-	2drop
-	R>                                                  ( buf)
 ;
 
 : XISF.write-map-XISF ( map buf --)
@@ -103,11 +118,55 @@ END-STRUCTURE
 	drop
 ;
 
-: XISF.write-map-FITS ( map buf --)
-\ write out the FITS map as a series of XML structures
-\ <FITSKeyword name="FOCUSPOS" value="2000" />
-	['] XISF.mapIterFITS rot ( buf xt map) simple-iterate-map
-	drop
+: create-imageDirectory ( FILEPATH_BUFFER --)
+\ if the image directory does not exist on disk, create it
+	>R
+	R@ ( buf) buffer-drive-to-string	R> buffer-dir-to-string makeDirLevels abort" cannot create image directory"
+;
+	
+DEFER write-XISFfilepath ( map buf --)
+\ map is a completed FITSKEY map that will interrogated to create the filename
+\ buf points to IMAGE_DESCRIPTOR..FILEPATH_BUFFER 
+
+: default_write-XISFfilepath { map buf -- }									\ VFX locals
+\ map is a completed FITSKEY map that will interrogated to create the filename
+\ buf may point to IMAGE_DESCRIPTOR..FILEPATH_BUFFER to complete the XISF structure
+\ 
+	\ directory
+	s" e:\images\" buf write-buffer drop
+	s" NIGHTOF" map >string buf write-buffer drop 
+	'\' buf echo-buffer drop
+	s" IMAGETYP" map >string buf write-buffer drop 
+	'\' buf echo-buffer drop
+	
+	buf buffer-punctuate-filepath
+	
+	\ filename
+	s" FILTER" map >string buf write-buffer drop 
+	'-' buf echo-buffer drop	
+	
+	'E' buf echo-buffer drop	
+	s" EXPTIME" map >string buf write-buffer drop
+	'-' buf echo-buffer drop		
+	
+	'F' buf echo-buffer drop
+	s" FOCUSPOS" map >string buf write-buffer drop 
+	'-' buf echo-buffer drop
+	
+	s" UUID" map >string drop 24 + 12 buf write-buffer drop
+	s" .xisf" buf write-buffer drop
+;
+
+	ASSIGN default_write-XISFfilepath TO-DO write-XISFfilepath		\ VFX state-smart alternatives to IS
+
+: initialize-XISFfilepath ( img --)
+\ prepare the filepath with filename for the XISF file
+\ called by save-image
+	>R
+	R@ FITS_MAP @ ( map)
+	R> XISF_FILEPATH_BUFFER
+	FILEPATH_SIZE over ( map buf FILEPATH_SIZE buf) declare-buffer
+	( map buf) write-XISFfilepath
 ;
 
 : initialize-XISFimage ( img --)
@@ -138,100 +197,6 @@ END-STRUCTURE
 	s" xisf" R@ xml.</tag>
 	R@ buffer_used R@ BUFFER_DESCRIPTOR + 8 + !	\ store the XISF header length
 	R> R> drop drop
-;	
-
-: initialize-FITSimage { img | buf -- }
-\ prepare the image in FITS format
-\ called by save-FITSimage
-	img FITS_BUFFER -> buf
-	buf reset-buffer
-	\ write the FITS map
-	img FITS_MAP @ buf XISF.write-map-FITS
-	\ write the END keyword
-	s" END" buf write-buffer drop
-	buf buffer_used 2880 /mod drop ( rem)
-	?dup if 
-		\ pad the buffer with spaces to a multiple of 2880 bytes
-		2880 swap ?do bl buf echo-buffer drop loop
-	then 
-;
-
-CODE convertDataFITS ( src dst n  -- )
-    \ Load pointers: EDX = source, ECX = destination. EBX contains byte count.
-    mov     edx, 4 [ebp]        \ source pointer
-    mov     ecx, 0 [ebp]        \ destination pointer    
-    test    ebx, ebx            \ check if byte count is zero
-    jz      L$2
-L$1:
-    cmp     ebx, 2              \ check if at least 2 bytes remain
-    jb      L$2
-    movzx   eax, word 0 [edx]   \ load 16-bit word (zero-extended to 32 bits)
-    sub     ax, 32768           \ subtract 32768 (convert unsigned to signed range)
-    xchg    al, ah              \ swap bytes (endian reversal: little->big)
-    mov     word 0 [ecx], ax    \ store converted word
-    add     edx, 2              \ move source pointer forward 2 bytes
-    add     ecx, 2              \ move destination pointer forward 2 bytes
-    sub     ebx, 2              \ decrement byte counter by 2
-    jmp     L$1                 \ continue loop
-L$2:
-    mov ebx, 08 [ebp]           \ move the 3rd stack item to the cached TOS
-    lea ebp, 12 [ebp]           \ move the stack pointer up by 3 cells
-    NEXT,    
-END-CODE
-
-\ : convertDataFITS ( src dst n  -- )
-\ \ move n bytes from src dst, reversing the endian as 16 bit words
-\     0 do
-\         over w@
-\         32768 -     \ camera returns [0, 65535] ; FITS format [-32768, 32767]
-\         twist2
-\         over w!
-\         2 + swap
-\         2 + swap
-\     2 +loop
-\     2drop
-\ ;
-    
-
-DEFER write-XISFfilepath ( map buf --)
-DEFER write-FITSfilepath ( map buf --)
-\ map is a completed FITSKEY map that will interrogated to create the filename
-\ buf points to IMAGE_DESCRIPTOR..FILEPATH_BUFFER 
-
-: initialize-image { img | map x y -- }
-   img FITS_MAP @ -> map
-   s" NAXIS1" map >integer -> x
-   s" NAXIS2" map >integer -> y
-   x img IMAGE_WIDTH !
-   y img IMAGE_HEIGHT !
-   x y * 2 * dup img IMAGE_SIZE_BYTES !
-   dup 2880 /mod drop ( rem) 2880 swap - +	img IMAGE_SIZE_WITH_PAD !
-;
-
-: initialize-XISFfilepath ( img --)
-\ prepare the filepath with filename for the XISF file
-\ called by save-image
-	>R
-	R@ FITS_MAP @ ( map)
-	R> XISF_FILEPATH_BUFFER
-	FILEPATH_SIZE over ( map buf FILEPATH_SIZE buf) declare-buffer
-	( map buf) write-XISFfilepath
-;
-
-: initialize-FITSfilepath ( img --)
-\ prepare the filepath with filename for the XISF file
-\ called by save-image
-	>R
-	R@ FITS_MAP @ ( map)
-	R> FITS_FILEPATH_BUFFER
-	FILEPATH_SIZE over ( map buf FILEPATH_SIZE buf) declare-buffer
-	( map buf) write-FITSfilepath
-;
-
-: create-imageDirectory ( FILEPATH_BUFFER --)
-\ if the image directory does not exist on disk, create it
-	>R
-	R@ ( buf) buffer-drive-to-string	R> buffer-dir-to-string makeDirLevels abort" cannot create image directory"
 ;
 
 : save-XISFimage { img | fileid -- }		\ VFX locals
@@ -247,20 +212,5 @@ DEFER write-FITSfilepath ( map buf --)
 	fileid close-file abort" Cannot close XISF file"
 ;
 
-: save-FITSimage { img | fileid FITSbuffer -- }		\ VFX locals
-\ save the image to an FITS file, the filename is created according to write-FITSfilepath_buffer
-\ save-FITSimage reverses the image bytes in memory to big-endian format so must be called AFTER save-XISF image
-	img initialize-FITSimage
-	img initialize-FITSfilepath
-	img FITS_FILEPATH_BUFFER create-imageDirectory
-	img FITS_FILEPATH_BUFFER buffer-to-string w/o 
-		create-file abort" Cannot create FITS file" -> fileid
-	img FITS_BUFFER fileid buffer-to-file
-	img IMAGE_SIZE_WITH_PAD @ allocate abort" unable to allocate image" -> FITSbuffer
-	img IMAGE_BITMAP FITSbuffer img IMAGE_SIZE_WITH_PAD @ convertDataFITS 
-	FITSbuffer img IMAGE_SIZE_WITH_PAD @ ( addr u ) fileid write-file abort" Cannot access FITS file"	
-	FITSbuffer free drop
-	fileid close-file abort" Cannot close FITS file"
-	
-;
+
 

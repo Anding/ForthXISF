@@ -1,5 +1,4 @@
 \ Functionality to load XISF files
-\ limited to XISF files created in ForthXISF!
 
 : xisf.open-file ( caddr u -- fileid buf 0 | IOR )
 \ open an XISF file and read the XISF header into buf
@@ -35,7 +34,6 @@
     fileid close-file drop
 ;
 
-
 : xisf.scan-for-fits ( img --) 
 \ scan an xisf header in an image and instantiate the fits map
     >R
@@ -49,7 +47,7 @@
             6 /string 1-                    ( caddr n)   
             s\" value=\"~\"*\"" R@ XISF_BUFFER buffer-match   
             if 
-                7 /string 1-                ( caddr n caddr n)     
+                7 /string 1- FITSstrToStr ( caddr n caddr n)     
                 2swap R@ FITS_map @
                 ( caddrV nV caddrK nK map) =>   
             then      
@@ -67,6 +65,7 @@
         dup -rot                    ( img fileid img)
         xisf.read-file              ( img)
         dup xisf.scan-for-fits      ( img) 
+        dup initialize-image        ( img)
         0
     else
         2drop

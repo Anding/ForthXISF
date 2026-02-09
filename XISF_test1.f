@@ -20,9 +20,9 @@ T{ 640 480 1 allocate-image CONSTANT img1 }T ==
 	
 : test_write-XISFfilepath ( map buf -- )
 	>R drop
-	s" e:\coding\ForthXISF\" R@ write-buffer drop
+	s" e:\coding\ForthXISF\testdata\" R@ write-buffer drop
 	R@ buffer-punctuate-filepath
-	s" XISF_test1.xisf" R@ write-buffer drop
+	s" test1.xisf" R@ write-buffer drop
 	R> drop
 ;
 	ASSIGN test_write-XISFfilepath TO-DO write-XISFfilepath	
@@ -39,20 +39,20 @@ cr img1 XISF_FILEPATH_BUFFER
 	drop
 T{ img1 XISF_FILEPATH_BUFFER create-imageDirectory }T ==
 T{ img1 save-XISFimage }T ==
-T{	img1 free-image }T ==
+T{ img1 free-image }T ==
 
 \ serialize XISF_test1.xisf and the reference file to buffers
-	s" %idir%\XISF_test1.xisf" r/o open-file drop
+	s" e:\coding\ForthXISF\testdata\test1.xisf" r/o open-file drop
 	constant fileid1
 	fileid1 file-to-buffer
 	constant buf1
 
-	s" %idir%\XISF_test1_reference.xisf" r/o open-file drop
+	s" e:\coding\ForthXISF\testdata\test1_reference.xisf" r/o open-file drop
 	constant fileid2
 	fileid2 file-to-buffer
 	constant buf2
 
-\ compare XISF_test1.xisf and the reference
+\ compare the file and the reference
 T{ buf1 buffer-to-string hashS }T buf2 buffer-to-string hashS ==
 
 Tend

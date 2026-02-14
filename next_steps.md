@@ -1,9 +1,6 @@
 ## ForthXISF next steps
 
-1. comply with FITS standards to place any values with non-numeric characters in ' '
-- the forth-map keys themselves should not contain quotation marks, for ease of processing
-- apply the quotation marks when saving the FITS file
-- remobe the quotations marks when creating a forth-map from FITS keys
+1. facility in the image descriptor to hold more than one image (for stacking flats and bias frames)
 
 ## save-png next steps
 

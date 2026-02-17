@@ -134,6 +134,9 @@
       <Project>{5b9dfee0-3e45-425b-a2fd-8932a6a0a1d3}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="program_reverse.asm" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

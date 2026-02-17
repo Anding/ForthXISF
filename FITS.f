@@ -39,7 +39,7 @@ CODE convertDataFITS ( src dst n  -- )
 L$1:
     cmp     ebx, 2              \ check if at least 2 bytes remain
     jb      L$2
-    movzx   eax, word 0 [edx]   \ load 16-bit word (zero-extended to 32 bits)
+    mov     ax, word 0 [edx]    \ load 16-bit word
     sub     ax, 32768           \ subtract 32768 (convert unsigned to signed range)
     xchg    al, ah              \ swap bytes (endian reversal: little->big)
     mov     word 0 [ecx], ax    \ store converted word
@@ -107,13 +107,13 @@ DEFER write-FITSfilepath ( map buf --)
 	s" SIMPLE  = T                                                                     " buf write-buffer drop
 	\ write the FITS map	
 	img FITS_MAP @ buf XISF.write-map-FITS
-	\ write the END keyword
-	s" END" buf write-buffer drop
-	buf buffer_used 2880 /mod drop ( rem)
-	?dup if 
-		\ pad the buffer with spaces to a multiple of 2880 bytes
-		2880 swap ?do bl buf echo-buffer drop loop
-	then 
+    \ fill the rest of the buffer with blank lines
+	buf buffer_space 80 / 1- 0 ?do
+	s"                                                                                 " buf write-buffer drop
+	loop
+	\ write the END keyword	
+	s" END                                                                             " buf write-buffer drop
+
 ;
 
 : save-FITSimage { img | fileid FITSbuffer -- }		\ VFX locals
@@ -124,8 +124,8 @@ DEFER write-FITSfilepath ( map buf --)
 	img FITS_FILEPATH_BUFFER create-imageDirectory
 	img FITS_FILEPATH_BUFFER buffer-to-string w/o 
 		create-file abort" Cannot create FITS file" -> fileid
-	img FITS_BUFFER fileid buffer-to-file
-	img IMAGE_SIZE_WITH_PAD @ allocate abort" unable to allocate image" -> FITSbuffer
+	img FITS_HEADER FITS_HEADER_SIZE fileid write-file abort" Cannot access FITS file"	
+	img IMAGE_SIZE_WITH_PAD @ allocate abort" unable to allocate FITS buffer" -> FITSbuffer
 	img IMAGE_BITMAP FITSbuffer img IMAGE_SIZE_WITH_PAD @ convertDataFITS 
 	FITSbuffer img IMAGE_SIZE_WITH_PAD @ ( addr u ) fileid write-file abort" Cannot access FITS file"	
 	FITSbuffer free drop

@@ -24,7 +24,7 @@ _start:
     jb      .done
     
     ; Process one 16-bit word
-    movzx   eax, word [edx]     ; load 16-bit word (zero-extended to 32 bits)
+    mov     ax, word [edx]      ; load 16-bit word
     sub     ax, 32768           ; subtract 32768 (convert unsigned to signed range)
     xchg    al, ah              ; swap bytes (endian reversal: little->big)
     mov     word [ecx], ax      ; store converted word

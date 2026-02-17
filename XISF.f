@@ -20,10 +20,10 @@ BEGIN-STRUCTURE IMAGE_DESCRIPTOR
                 4   +FIELD IMAGE_SIZE_BYTES			\ image size in bytes
                 4   +FIELD IMAGE_SIZE_WITH_PAD		\ image size after padding to 2880 boundary for FITS
                 4   +FIELD FITS_MAP					\ pointer to the key-value FITS map
-BUFFER_DESCRIPTOR   +FIELD XISF_FILEPATH_BUFFER	\ descriptor to the XISF filepath with filename buffer
-FILEPATH_SIZE       +FIELD XISF_FILEPATH				\ XISF filepath with filename, as a buffer
-BUFFER_DESCRIPTOR   +FIELD FITS_FILEPATH_BUFFER	\ descriptor to the XISF filepath with filename buffer
-FILEPATH_SIZE       +FIELD FITS_FILEPATH				\ XISF filepath with filename, as a buffer				 			 
+BUFFER_DESCRIPTOR   +FIELD XISF_FILEPATH_BUFFER	    \ descriptor to the XISF filepath with filename buffer
+FILEPATH_SIZE       +FIELD XISF_FILEPATH			\ XISF filepath with filename, as a buffer
+BUFFER_DESCRIPTOR   +FIELD FITS_FILEPATH_BUFFER	    \ descriptor to the XISF filepath with filename buffer
+FILEPATH_SIZE       +FIELD FITS_FILEPATH			\ XISF filepath with filename, as a buffer				 			 
 BUFFER_DESCRIPTOR   +FIELD FITS_BUFFER				\ descriptor to the FITS header buffer
 FITS_HEADER_SIZE    +FIELD FITS_HEADER				\ FITS header buffer immediately follows the descriptor
 BUFFER_DESCRIPTOR   +FIELD XISF_BUFFER				\ descriptor to the XISF header buffer

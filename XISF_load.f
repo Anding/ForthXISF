@@ -56,7 +56,7 @@
     R> drop
 ;
 
-: xisf.load-file ( caddr u | fileid buf img  -- img 0 | IOR )
+: xisf.load-file ( caddr u -- img 0 | IOR )
 \ allocate an image buffer and load an XISF file 
     xisf.open-file if exit then     ( fileid buf)
     xisf.scan-for-geometry          ( fileid width height depth) 
@@ -65,7 +65,6 @@
         dup -rot                    ( img fileid img)
         xisf.read-file              ( img)
         dup xisf.scan-for-fits      ( img) 
-        dup initialize-image        ( img)
         0
     else
         2drop

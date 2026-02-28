@@ -54,6 +54,7 @@ END-STRUCTURE
 
 : free-image ( img --)
 \ release the memory allocated to an image
+    dup IMAGE_STATISTICS @ ?dup if free drop then    \ free the imageStats buffer if there is one
 	free drop
 ;
 

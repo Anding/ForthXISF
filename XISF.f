@@ -23,8 +23,10 @@ BEGIN-STRUCTURE IMAGE_DESCRIPTOR
                 4   +FIELD IMAGE_STATISTICS         \ pointer to an image statistics object
 BUFFER_DESCRIPTOR   +FIELD XISF_FILEPATH_BUFFER	    \ descriptor to the XISF filepath with filename buffer
 FILEPATH_SIZE       +FIELD XISF_FILEPATH			\ XISF filepath with filename, as a buffer
-BUFFER_DESCRIPTOR   +FIELD FITS_FILEPATH_BUFFER	    \ descriptor to the XISF filepath with filename buffer
-FILEPATH_SIZE       +FIELD FITS_FILEPATH			\ XISF filepath with filename, as a buffer				 			 
+BUFFER_DESCRIPTOR   +FIELD FITS_FILEPATH_BUFFER	    \ descriptor to the FITS filepath with filename buffer
+FILEPATH_SIZE       +FIELD FITS_FILEPATH			\ FITS filepath with filename, as a buffer	
+BUFFER_DESCRIPTOR   +FIELD PNG_FILEPATH_BUFFER	    \ descriptor to the PNG filepath with filename buffer
+FILEPATH_SIZE       +FIELD PNG_FILEPATH			    \ PNG filepath with filename, as a buffer				 			 
 BUFFER_DESCRIPTOR   +FIELD FITS_BUFFER				\ descriptor to the FITS header buffer
 FITS_HEADER_SIZE    +FIELD FITS_HEADER				\ FITS header buffer immediately follows the descriptor
 BUFFER_DESCRIPTOR   +FIELD XISF_BUFFER				\ descriptor to the XISF header buffer

@@ -86,8 +86,6 @@ DEFER write-FITSfilepath ( map buf --)
 
     ASSIGN default_write-FITSfilepath TO-DO write-FITSfilepath
 
-
-	
 : initialize-FITSfilepath ( img --)
 \ prepare the filepath with filename for the XISF file
 \ called by save-image

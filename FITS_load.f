@@ -70,7 +70,7 @@ CODE reverseConvertDataFITS ( src n  -- )
 L$1:
     cmp     ebx, 2              \ check if at least 2 bytes remain
     jb      L$2
-    mov     ax, word 0 [edx]    \ load 16-bit word
+    movzx   ax, word 0 [edx]    \ load 16-bit word, zero extend as good practice
     xchg    al, ah              \ swap bytes (endian reversal: big->little)
     add     ax, 32768           \ add 32768 (convert signed to unsigned range)
     mov     word 0 [edx], ax    \ store converted word

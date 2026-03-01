@@ -39,7 +39,7 @@ CODE convertDataFITS ( src dst n  -- )
 L$1:
     cmp     ebx, 2              \ check if at least 2 bytes remain
     jb      L$2
-    mov     ax, word 0 [edx]    \ load 16-bit word
+    movzx   ax, word 0 [edx]    \ load 16-bit word, zero extend as good practice
     sub     ax, 32768           \ subtract 32768 (convert unsigned to signed range)
     xchg    al, ah              \ swap bytes (endian reversal: little->big)
     mov     word 0 [ecx], ax    \ store converted word

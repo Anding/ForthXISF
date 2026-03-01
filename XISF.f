@@ -8,6 +8,10 @@ NEED buffers
 NEED forth-map
 NEED ForthXML
 
+LIBRARY: XISF.dll
+Extern: int "C" SaveBitmapAsBinary( int * bitmap, int width, int height, char * filename ) ;
+Extern: int "C" SaveBitmapAsPNG( int * bitmap, int width, int height, char * filename ) ;
+
 256   constant FILEPATH_SIZE
 8192  constant XISF_HEADER_SIZE
 11520 constant FITS_HEADER_SIZE	\ enough for 144 80-column cards, being 4 x 2880
@@ -26,7 +30,9 @@ FILEPATH_SIZE       +FIELD XISF_FILEPATH			\ XISF filepath with filename, as a b
 BUFFER_DESCRIPTOR   +FIELD FITS_FILEPATH_BUFFER	    \ descriptor to the FITS filepath with filename buffer
 FILEPATH_SIZE       +FIELD FITS_FILEPATH			\ FITS filepath with filename, as a buffer	
 BUFFER_DESCRIPTOR   +FIELD PNG_FILEPATH_BUFFER	    \ descriptor to the PNG filepath with filename buffer
-FILEPATH_SIZE       +FIELD PNG_FILEPATH			    \ PNG filepath with filename, as a buffer				 			 
+FILEPATH_SIZE       +FIELD PNG_FILEPATH			    \ PNG filepath with filename, as a buffer	
+BUFFER_DESCRIPTOR   +FIELD RAW_FILEPATH_BUFFER	    \ descriptor to the RAW filepath with filename buffer
+FILEPATH_SIZE       +FIELD RAW_FILEPATH			    \ RAW filepath with filename, as a buffer				 			 
 BUFFER_DESCRIPTOR   +FIELD FITS_BUFFER				\ descriptor to the FITS header buffer
 FITS_HEADER_SIZE    +FIELD FITS_HEADER				\ FITS header buffer immediately follows the descriptor
 BUFFER_DESCRIPTOR   +FIELD XISF_BUFFER				\ descriptor to the XISF header buffer

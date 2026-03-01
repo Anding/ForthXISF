@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Astro Image Viewer</title>
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            font-family: 'Courier New', monospace;
+        }
+        #controls {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border: 1px solid #0f0;
+            color: #0f0;
+            z-index: 100;
+        }
+        #info {
+            color: #0f0;
+            margin-bottom: 10px;
+        }
+        canvas {
+            display: block;
+            margin: 150px auto 20px auto;
+            border: 1px solid #333;
+            image-rendering: pixelated;
+        }
+        input[type="range"] {
+            width: 200px;
+        }
+        button {
+            background: #000;
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+        }
+        button:hover {
+            background: #0f0;
+            color: #000;
+        }
+        label {
+            display: inline-block;
+            width: 80px;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <div id="info">Ready - Drop .raw file or browse/enter filename</div>
+        <div>
+            <input type="file" id="filepicker" accept=".raw,.bin" style="display: none;" onchange="loadFromPicker()">
+            <button onclick="document.getElementById('filepicker').click()">Browse...</button>
+            <input type="text" id="filename" placeholder="image.raw (server mode)" style="width: 150px; background: #000; color: #0f0; border: 1px solid #0f0;">
+            <button onclick="loadFile()">Load</button>
+            <button onclick="autoRefresh()">Auto-Refresh</button>
+        </div>
+        <div style="margin-top: 10px;">
+            <label>Zoom:</label>
+            <input type="range" id="zoom" min="5" max="200" value="100" oninput="updateZoom()">
+            <span id="zoomVal">100%</span>
+        </div>
+    </div>
+    
+    <canvas id="viewer"></canvas>
+    
+    <script>
+        const canvas = document.getElementById('viewer');
+        const ctx = canvas.getContext('2d');
+        const info = document.getElementById('info');
+        
+        let currentImageData = null;
+        let rawPixels = null;
+        let imageWidth = 0;
+        let imageHeight = 0;
+        let autoRefreshInterval = null;
+        
+        // Allow drag-and-drop
+        document.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+        
+        document.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    loadImageFromBuffer(event.target.result);
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        });
+        
+        function loadFromPicker() {
+            const file = document.getElementById('filepicker').files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    loadImageFromBuffer(event.target.result);
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        }
+
+        function loadFile() {
+            const filename = document.getElementById('filename').value || 'image.raw';
+            fetch(filename)
+                .then(response => {
+                    if (!response.ok) throw new Error('File not found');
+                    return response.arrayBuffer();
+                })
+                .then(buffer => loadImageFromBuffer(buffer))
+                .catch(err => {
+                    info.textContent = 'Error: ' + err.message + ' (use Browse or drag-drop for local files)';
+                });
+        }
+        
+        function loadImageFromBuffer(buffer) {
+            try {
+                const data = new DataView(buffer);
+                
+                // Validate magic number
+                const magic = String.fromCharCode(
+                    data.getUint8(0), data.getUint8(1),
+                    data.getUint8(2), data.getUint8(3)
+                );
+                
+                if (magic !== 'AIMG') {
+                    info.textContent = 'Error: Invalid file format (magic: ' + magic + ')';
+                    return;
+                }
+                
+                imageWidth = data.getUint32(4, true);
+                imageHeight = data.getUint32(8, true);
+                const bitDepth = data.getUint16(12, true);
+                
+                canvas.width = imageWidth;
+                canvas.height = imageHeight;
+                
+                // Store raw 16-bit pixels
+                rawPixels = new Uint16Array(imageWidth * imageHeight);
+                for (let i = 0; i < imageWidth * imageHeight; i++) {
+                    rawPixels[i] = data.getUint16(16 + i * 2, true);
+                }
+
+                renderImage();
+                
+                info.textContent = `${imageWidth}×${imageHeight} @ ${bitDepth}-bit - ${new Date().toLocaleTimeString()}`;
+            } catch (err) {
+                info.textContent = 'Error: ' + err.message;
+            }
+        }
+        
+        function renderImage() {
+            if (!rawPixels) return;
+
+            currentImageData = ctx.createImageData(imageWidth, imageHeight);
+
+            for (let i = 0; i < rawPixels.length; i++) {
+                // Convert 16-bit to 8-bit by extracting high byte
+                const pixel8 = rawPixels[i] >> 8;
+
+                currentImageData.data[i * 4] = pixel8;
+                currentImageData.data[i * 4 + 1] = pixel8;
+                currentImageData.data[i * 4 + 2] = pixel8;
+                currentImageData.data[i * 4 + 3] = 255;
+            }
+
+            ctx.putImageData(currentImageData, 0, 0);
+        }
+        
+        function updateZoom() {
+            const zoom = parseInt(document.getElementById('zoom').value);
+            document.getElementById('zoomVal').textContent = zoom + '%';
+            canvas.style.width = (imageWidth * zoom / 100) + 'px';
+            canvas.style.height = (imageHeight * zoom / 100) + 'px';
+        }
+        
+        function autoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+                info.textContent = info.textContent.replace(' [AUTO]', '');
+            } else {
+                autoRefreshInterval = setInterval(loadFile, 1000);
+                info.textContent += ' [AUTO]';
+            }
+        }
+    </script>
+</body>
+</html>

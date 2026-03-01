@@ -1,9 +1,5 @@
 \ save a 16-bit greyscale image as an 8-bit PNG file
 
-LIBRARY: XISF.dll
-    
-Extern: void "C" SaveBitmapAsPNG( int * bitmap, int width, int height, char * filename ) ;
-
 DEFER write-PNGfilepath ( map buf --)
 
 : default_write-PNGfilepath { map buf -- }
@@ -16,8 +12,6 @@ DEFER write-PNGfilepath ( map buf --)
     ASSIGN default_write-PNGfilepath TO-DO write-PNGfilepath
     
 : initialize-PNGfilepath ( img --)
-\ prepare the filepath with filename for the XISF file
-\ called by save-image
 	>R
 	R@ FITS_MAP @ ( map)
 	R> PNG_FILEPATH_BUFFER
@@ -26,8 +20,6 @@ DEFER write-PNGfilepath ( map buf --)
 ;
 
 : save-PNGimage ( img -- )
-\ save the image to an FITS file, the filename is created according to write-FITSfilepath_buffer
-\ save-FITSimage reverses the image bytes in memory to big-endian format so must be called AFTER save-XISF image
 	>R
 	R@ initialize-PNGfilepath
 	R@ PNG_FILEPATH_BUFFER create-imageDirectory
@@ -35,6 +27,6 @@ DEFER write-PNGfilepath ( map buf --)
     R@ IMAGE_WIDTH @
     R@ IMAGE_HEIGHT @
     R@ PNG_FILEPATH_BUFFER buffer-to-string drop
-    ( bitmap width height caddr) SaveBitmapAsPNG
+    ( bitmap width height caddr) SaveBitmapAsPNG if ." Error writing PNG file" then
     R> drop
 ;

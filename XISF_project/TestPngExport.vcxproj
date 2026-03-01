@@ -136,6 +136,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="program_reverse.asm" />
+    <None Include="RAW_FORMAT_README.md" />
+    <None Include="viewer.html" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

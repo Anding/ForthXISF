@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClCompile Include="dllmain.c" />
     <ClCompile Include="xisf_png.c" />
+    <ClCompile Include="xisf_raw.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -23,5 +23,7 @@
     <None Include="program_reverse.asm">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="viewer.html" />
+    <None Include="RAW_FORMAT_README.md" />
   </ItemGroup>
 </Project>

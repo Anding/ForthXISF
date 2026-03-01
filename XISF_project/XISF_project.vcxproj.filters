@@ -32,5 +32,8 @@
     <ClCompile Include="xisf_png.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="xisf_raw.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

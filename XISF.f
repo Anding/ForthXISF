@@ -9,7 +9,7 @@ NEED forth-map
 NEED ForthXML
 
 LIBRARY: XISF.dll
-Extern: int "C" SaveBitmapAsBinary( int * bitmap, int width, int height, char * filename ) ;
+\ Extern: int "C" SaveBitmapAsBinary( int * bitmap, int width, int height, char * filename ) ;
 Extern: int "C" SaveBitmapAsPNG( int * bitmap, int width, int height, char * filename ) ;
 
 256   constant FILEPATH_SIZE

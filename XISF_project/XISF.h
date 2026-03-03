@@ -51,14 +51,15 @@ XISF_API int SaveBitmapAsPNG(
  *         -2: Invalid dimensions (width or height <= 0)
  *         -3: Cannot open file
  *         -4: Write failed
- */
+
 XISF_API int SaveBitmapAsBinary(
 	const uint16_t* bitmap,
 	int width,
 	int height,
 	const char* filename
 );
-
+ */
+ 
 #ifdef __cplusplus
 }
 #endif

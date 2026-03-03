@@ -19,14 +19,26 @@ DEFER write-RAWfilepath ( map buf --)
 	( map buf) write-RAWfilepath
 ;
 
-: save-RAWimage ( img -- )
-	>R
-	R@ initialize-RAWfilepath
-	R@ RAW_FILEPATH_BUFFER create-imageDirectory
-    R@ IMAGE_BITMAP
-    R@ IMAGE_WIDTH @
-    R@ IMAGE_HEIGHT @
-    R@ RAW_FILEPATH_BUFFER buffer-to-string drop
-    ( bitmap width height caddr) SaveBitmapAsBinary if ." Error writing RAW file" then
-    R> drop
+: SaveBitmapAsBinary { bitmap width height caddr | fileid bitdepth t -- IOR }
+    caddr zcount delete-file drop
+    caddr zcount w/o create-file if -1 exit then -> fileid
+    s" AIMG" fileid write-file drop
+    ADDR width 4 fileid write-file drop
+    ADDR height 4 fileid write-file drop
+    16 -> bitdepth
+    ADDR bitdepth 4 fileid write-file drop
+    0 -> t
+    ADDR t 4 fileid write-file drop
+    bitmap width height * 2* fileid write-file drop
+    fileid close-file ( IOR)
+;
+
+: save-RAWimage { img -- }
+	img initialize-RAWfilepath
+	img RAW_FILEPATH_BUFFER create-imageDirectory
+    img IMAGE_BITMAP
+    img IMAGE_WIDTH @
+    img IMAGE_HEIGHT @
+    img RAW_FILEPATH_BUFFER buffer-to-string drop
+    ( bitmap width height caddr) SaveBitmapAsBinary abort" Error writing RAW file"
 ;

@@ -146,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.c" />
+    <ClCompile Include="xisf_bmp.c" />
     <ClCompile Include="xisf_png.c" />
     <ClCompile Include="xisf_raw.c" />
   </ItemGroup>

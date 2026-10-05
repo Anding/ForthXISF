@@ -23,6 +23,13 @@ TSlength buffer: xisf.TSstring
 	R> drop
 ;	
 
+: add-observationEndFITS ( map --)
+\ Record the UTC completion timestamp after image download and processing.
+    >R
+    xisf.TSstring 0 make-timestamp R@ =>" DATE-END"
+    R> drop
+;
+
 : add-rigFITS ( map --)
 \ add key value pairs for FITS rig parameters
 	>R

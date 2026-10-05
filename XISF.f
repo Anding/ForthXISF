@@ -11,13 +11,16 @@ NEED ForthXML
 LIBRARY: XISF.dll
 \ Extern: int "C" SaveBitmapAsBinary( int * bitmap, int width, int height, char * filename ) ;
 Extern: int "C" SaveBitmapAsPNG( int * bitmap, int width, int height, char * filename ) ;
+Extern: int "C" SaveBitmapAsBMP( int * bitmap, int width, int height, char * filename ) ;
+Extern: int "C" ReplaceFileAtomic( char * source, char * destination ) ;
 
 256   constant FILEPATH_SIZE
 8192  constant XISF_HEADER_SIZE
 11520 constant FITS_HEADER_SIZE	\ enough for 144 80-column cards, being 4 x 2880
 
-\ descriptor data structure for an image
-BEGIN-STRUCTURE IMAGE_DESCRIPTOR
+\ General image context. Writers and analysis attach their state through this
+\ shared representation rather than defining image-format-specific images.
+BEGIN-STRUCTURE IMAGE_CONTEXT
                 4   +FIELD IMAGE_WIDTH				\ width in pixels
                 4   +FIELD IMAGE_HEIGHT				\ height in pixels
                 4   +FIELD IMAGE_DEPTH				\ depth in bitplane
@@ -39,6 +42,9 @@ BUFFER_DESCRIPTOR   +FIELD XISF_BUFFER				\ descriptor to the XISF header buffer
 XISF_HEADER_SIZE    +FIELD XISF_HEADER				\ XISF header buffer immediately follows the descriptor
 				0 	+FIELD IMAGE_BITMAP				\ image bitmap immediately follows the XISF header
 END-STRUCTURE
+
+\ Preserve the original public descriptor word and all existing stack effects.
+IMAGE_CONTEXT constant IMAGE_DESCRIPTOR
 
 : allocate-image  ( width height depth -- img )
 \ allocate memory and establish a new image, as represented by a descriptor
@@ -221,6 +227,5 @@ DEFER write-XISFfilepath ( map buf --)
 		fileid write-file abort" Cannot access XISF file"	
 	fileid close-file abort" Cannot close XISF file"
 ;
-
 
 

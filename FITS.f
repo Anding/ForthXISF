@@ -114,13 +114,11 @@ DEFER write-FITSfilepath ( map buf --)
 
 ;
 
-: save-FITSimage { img | fileid FITSbuffer -- }		\ VFX locals
-\ save the image to an FITS file, the filename is created according to write-FITSfilepath_buffer
-\ save-FITSimage reverses the image bytes in memory to big-endian format so must be called AFTER save-XISF image
+: save-FITSimage-to { img filepath-buffer | fileid FITSbuffer -- }
+\ save the image to the caller-selected filepath buffer
 	img initialize-FITSimage
-	img initialize-FITSfilepath
-	img FITS_FILEPATH_BUFFER create-imageDirectory
-	img FITS_FILEPATH_BUFFER buffer-to-string w/o 
+	filepath-buffer create-imageDirectory
+	filepath-buffer buffer-to-string w/o
 		create-file abort" Cannot create FITS file" -> fileid
 	img FITS_HEADER FITS_HEADER_SIZE fileid write-file abort" Cannot access FITS file"	
 	img IMAGE_SIZE_WITH_PAD @ allocate abort" unable to allocate FITS buffer" -> FITSbuffer
@@ -128,4 +126,10 @@ DEFER write-FITSfilepath ( map buf --)
 	FITSbuffer img IMAGE_SIZE_WITH_PAD @ ( addr u ) fileid write-file abort" Cannot access FITS file"	
 	FITSbuffer free drop
 	fileid close-file abort" Cannot close FITS file"
+;
+
+: save-FITSimage { img -- }
+\ save the image to the configured FITS filepath
+	img initialize-FITSfilepath
+	img img FITS_FILEPATH_BUFFER save-FITSimage-to
 ;

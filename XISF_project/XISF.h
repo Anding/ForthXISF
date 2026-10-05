@@ -32,6 +32,25 @@ XISF_API int SaveBitmapAsPNG(
 );
 
 /**
+ * Save a 16-bit greyscale bitmap as an uncompressed 8-bit greyscale BMP.
+ * Each output pixel is the high byte of the input sample.
+ */
+XISF_API int SaveBitmapAsBMP(
+	const uint16_t* bitmap,
+	int width,
+	int height,
+	const char* filename
+);
+
+/**
+ * Atomically replace destination with source on the same filesystem.
+ */
+XISF_API int ReplaceFileAtomic(
+	const char* source,
+	const char* destination
+);
+
+/**
  * Save a 16-bit greyscale bitmap as a raw binary file with minimal header
  * 
  * File format:
@@ -63,4 +82,3 @@ XISF_API int SaveBitmapAsBinary(
 #ifdef __cplusplus
 }
 #endif
-

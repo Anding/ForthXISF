@@ -39,6 +39,12 @@ source and destination paths. It appends the required NUL terminators and
 uses the native `ReplaceFileAtomic` export, which replaces the destination
 only after a completed temporary manifest exists.
 
+VFXterm is a 32-bit process and must be able to load the Win32 Release
+`XISF.dll`. Deploy
+`XISF_project\Release\XISF.dll` beside `VFXterm.exe` before exercising any
+native XISF export. An unresolved DLL binding can terminate VFX on its first
+native call; `FITS_projection_test1.f` verifies the atomic replacement path.
+
 ## Preview BMP output
 
 ```forth

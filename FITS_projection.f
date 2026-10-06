@@ -27,5 +27,5 @@
     0 destination-buffer echo-buffer abort" Publication destination path buffer full"
     source-buffer buffer-to-string drop
     destination-buffer buffer-to-string drop
-    ReplaceFileAtomic >R 2drop R> abort" Cannot replace publication manifest"
+    ReplaceFileAtomic abort" Cannot replace publication manifest"
 ;

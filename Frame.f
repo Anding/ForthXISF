@@ -27,13 +27,18 @@ FRAME constant FRAME_DESCRIPTOR
     height frame FRAME_HEIGHT !
     width frame FRAME_WIDTH !
     frame FRAME_BITMAP bytes erase
-    map frame FRAME_METADATA !
+    ordered-map frame FRAME_METADATA !
     frame
 ;
 
 : free-frame ( frame -- )
+    dup FRAME_METADATA @ ?dup if free-map then
     dup FRAME_STATISTICS @ ?dup if free drop then
     free drop
+;
+
+: reset-frame-metadata ( frame -- )
+    FRAME_METADATA @ reset-map
 ;
 
 : frame-size ( frame -- size-in-bytes )

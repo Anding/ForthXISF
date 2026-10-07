@@ -1,4 +1,4 @@
-need forthXISF
+need ForthFrameTools
 
 need simple-tester
 0 value image1
@@ -18,14 +18,17 @@ need simple-tester
 ;
 
     make-test.xisf -> image1      
-    image1 XISF.spawn -> image2
+    image1 frame.allocate-like -> image2
     
 cr 
 Tstart
 T{ image1 FRAME_SIZE_BYTES @ }T image2 FRAME_SIZE_BYTES @ ==
-T{ image1 FRAME_METADATA @ }T image2 FRAME_METADATA @ ==
+T{ image1 FRAME_METADATA @ }T image2 FRAME_METADATA @ <>
 cr
 Tend
 cr
 
+image1 free-frame
+image2 free-frame
+bye
     

@@ -1,30 +1,17 @@
-need forthXISF
-include "%idir%\RAW.f"
+\ RAW export with an explicit destination buffer.
 
-0 value image
-	
-: make-random.xisf { | map img -- img }
-    640 480 1 allocate-frame -> img
-    img FRAME_METADATA @ -> map
-    s" 16" map =>" BITPIX"	
-    s" 2"	map =>" NAXIS"	
-    s" 640" map =>" NAXIS1"
-    s" 480" map =>" NAXIS2" 
-    640 480 * 0 do
-        0x10000 choose img FRAME_BITMAP i 2* + w!   \ random 16 bit words
-    loop   
-    img
-;
+NEED simple-tester
+NEED ForthImageExport
+include "%idir%\ForthAstroFormats_test_support.f"
 
-    make-random.xisf -> image
-    
-: test_write-RAWfilepath { map buf -- }
-	s" E:\coding\ForthAstroFormats\testdata\" buf write-buffer drop
-	buf buffer-punctuate-filepath
-	s" random-image.raw" buf write-buffer drop
-	0 buf echo-buffer drop                                   \ zero terminated string
-;
+FILEPATH_SIZE allocate-buffer constant raw.test.path
+test.make-frame constant raw.test.frame
+s" frame.raw" raw.test.path test.prepare-path drop
+raw.test.frame raw.test.path save-RAWimage-to
 
-    ASSIGN test_write-RAWfilepath TO-DO write-RAWfilepath      
- 
-    image save-RAWimage
+Tstart
+T{ raw.test.path buffer-to-string FileExists? }T -1 ==
+Tend
+
+raw.test.frame free-frame
+bye

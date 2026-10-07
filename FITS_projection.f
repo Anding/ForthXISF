@@ -28,9 +28,9 @@ NEED ForthAtomicFile
 : replace-file-atomically { source-buffer destination-buffer -- }
     0 source-buffer echo-buffer abort" Publication source path buffer full"
     0 destination-buffer echo-buffer abort" Publication destination path buffer full"
-    source-buffer buffer-to-string drop
-    destination-buffer buffer-to-string drop
     10 0 do
+        source-buffer buffer-to-string drop
+        destination-buffer buffer-to-string drop
         ReplaceFileAtomic 0= if unloop exit then
         100 ms
     loop

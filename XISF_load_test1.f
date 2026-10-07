@@ -1,59 +1,32 @@
-need forthXISF
-need simple-tester
-0 value image1
-0 value image2
+\ XISF write/load round-trip with explicit codec destinations.
 
-: testA_write-XISFfilepath ( map buf -- )
-	>R drop
-	s" e:\coding\ForthAstroFormats\testdata\" R@ write-buffer drop
-	R@ buffer-punctuate-filepath
-	s" test2.xisf" R@ write-buffer drop
-	R> drop
-;
-	ASSIGN testA_write-XISFfilepath TO-DO write-XISFfilepath
-	
-: make-test2.xisf { | map img -- img }
-    640 480 1 allocate-frame -> img
-    img FRAME_METADATA @ -> map
-    s" 16" map =>" BITPIX"	
-    s" 2"	map =>" NAXIS"	
-    s" 640" map =>" NAXIS1"
-    s" 480" map =>" NAXIS2" 
-    640 480 * 0 do
-        0x10000 choose img FRAME_BITMAP i 2* + w!   \ random 16 bit words
-    loop   
-    img save-XISFimage 
-    img
+NEED simple-tester
+include "%idir%\ForthAstroFormats_test_support.f"
+
+FILEPATH_SIZE allocate-buffer constant xisf.roundtrip.path
+FILEPATH_SIZE allocate-buffer constant xisf.clone.path
+0 value xisf.source
+0 value xisf.clone
+
+: xisf.load-roundtrip { filepath-buffer -- frame }
+    filepath-buffer buffer-to-string xisf.load-file
+    if abort" Cannot load XISF round-trip" then
 ;
 
-    make-test2.xisf -> image1
+test.make-frame -> xisf.source
+s" roundtrip.xisf" xisf.roundtrip.path test.prepare-path drop
+xisf.source xisf.roundtrip.path save-XISFimage-to
+xisf.roundtrip.path xisf.load-roundtrip -> xisf.clone
+s" clone.xisf" xisf.clone.path test.prepare-path drop
+xisf.clone xisf.clone.path save-XISFimage-to
 
-: test_write-XISFfilepath { map buf -- }
-	s" E:\coding\ForthAstroFormats\testdata\" buf write-buffer drop
-	buf buffer-punctuate-filepath
-	s" clone.xisf" buf write-buffer drop 
-;
-
-ASSIGN test_write-XISFfilepath TO-DO write-XISFfilepath
-
-: test.xisf.load-file  ( caddr u -- img)
-    xisf.load-file ( img 0 | IOR )
-    0= if 
-        dup save-XISFimage
-    else 
-        0
-    then
-;         
- 
-cr 
 Tstart
-
-T{ s" E:\coding\ForthAstroFormats\testdata\test2.xisf" test.xisf.load-file -> image2
-   s" E:\coding\ForthAstroFormats\testdata\clone.xisf" hashF }T
-   s" E:\coding\ForthAstroFormats\testdata\test2.xisf" hashF ==
-   
-cr
+T{ xisf.source FRAME_WIDTH @ }T xisf.clone FRAME_WIDTH @ ==
+T{ xisf.source FRAME_HEIGHT @ }T xisf.clone FRAME_HEIGHT @ ==
+T{ xisf.source frame-size }T xisf.clone frame-size ==
+T{ xisf.roundtrip.path buffer-to-string hashF }T xisf.clone.path buffer-to-string hashF ==
 Tend
-cr
 
-    
+xisf.source free-frame
+xisf.clone free-frame
+bye

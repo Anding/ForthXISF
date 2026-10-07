@@ -1,57 +1,32 @@
-need forthXISF
-need simple-tester
-0 value image1
-0 value image2
+\ FITS write/load round-trip with explicit codec destinations.
 
-: testA_write-FITSfilepath ( map buf -- )
-	>R drop
-	s" e:\coding\ForthAstroFormats\testdata\" R@ write-buffer drop
-	R@ buffer-punctuate-filepath
-	s" test2.fits" R@ write-buffer drop
-	R> drop
-;
-	ASSIGN testA_write-FITSfilepath TO-DO write-FITSfilepath
+NEED simple-tester
+include "%idir%\ForthAstroFormats_test_support.f"
 
-: make-test2.fits { | map img -- img }
-    640 480 1 allocate-frame -> img
-    img FRAME_METADATA @ -> map
-    s" 16" map =>" BITPIX"	
-    s" 2"	map =>" NAXIS"	
-    s" 640" map =>" NAXIS1"
-    s" 480" map =>" NAXIS2" 
-    640 480 * 0 do
-        0x10000 choose img FRAME_BITMAP i 2* + w!   \ random 16 bit words
-    loop   
-    img save-FITSimage 
-    img
+FILEPATH_SIZE allocate-buffer constant fits.roundtrip.path
+FILEPATH_SIZE allocate-buffer constant fits.clone.path
+0 value fits.source
+0 value fits.clone
+
+: fits.load-roundtrip { filepath-buffer -- frame }
+    filepath-buffer buffer-to-string xisf.load-FITSfile
+    if abort" Cannot load FITS round-trip" then
 ;
 
-    make-test2.fits -> image1
+test.make-frame -> fits.source
+s" roundtrip.fits" fits.roundtrip.path test.prepare-path drop
+fits.source fits.roundtrip.path save-FITSimage-to
+fits.roundtrip.path fits.load-roundtrip -> fits.clone
+s" clone.fits" fits.clone.path test.prepare-path drop
+fits.clone fits.clone.path save-FITSimage-to
 
-: testB_write-FITSfilepath { map buf -- }
-	s" E:\coding\ForthAstroFormats\testdata\" buf write-buffer drop
-	buf buffer-punctuate-filepath
-	s" clone.fits" buf write-buffer drop 
-;
-
-ASSIGN testB_write-FITSfilepath TO-DO write-FITSfilepath
-
-: test.xisf.load-FITSfile ( caddr u -- img)
-    xisf.load-FITSfile ( img 0 | IOR )
-    0= if
-        dup save-FITSimage  
-    else
-        0      
-    then
-;         
- 
-cr 
 Tstart
-
-T{ s" E:\coding\ForthAstroFormats\testdata\test2.fits" test.xisf.load-FITSfile -> image2
-   s" E:\coding\ForthAstroFormats\testdata\clone.fits" hashF }T
-   s" E:\coding\ForthAstroFormats\testdata\test2.fits" hashF ==
-   
-cr
+T{ fits.source FRAME_WIDTH @ }T fits.clone FRAME_WIDTH @ ==
+T{ fits.source FRAME_HEIGHT @ }T fits.clone FRAME_HEIGHT @ ==
+T{ fits.source frame-size }T fits.clone frame-size ==
+T{ fits.roundtrip.path buffer-to-string hashF }T fits.clone.path buffer-to-string hashF ==
 Tend
-cr
+
+fits.source free-frame
+fits.clone free-frame
+bye

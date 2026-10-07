@@ -13,14 +13,14 @@ need simple-tester
 	ASSIGN testA_write-XISFfilepath TO-DO write-XISFfilepath
 	
 : make-test2.xisf { | map img -- img }
-    640 480 1 allocate-image -> img
-    img FITS_MAP @ -> map
+    640 480 1 allocate-frame -> img
+    img FRAME_METADATA @ -> map
     s" 16" map =>" BITPIX"	
     s" 2"	map =>" NAXIS"	
     s" 640" map =>" NAXIS1"
     s" 480" map =>" NAXIS2" 
     640 480 * 0 do
-        0x10000 choose img IMAGE_BITMAP i 2* + w!   \ random 16 bit words
+        0x10000 choose img FRAME_BITMAP i 2* + w!   \ random 16 bit words
     loop   
     img save-XISFimage 
     img

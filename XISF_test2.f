@@ -9,11 +9,11 @@ CR
 UUIDlength buffer: UUIDstring  
 TSlength buffer: TSstring
 	
-	640 480 1 allocate-image
+	640 480 1 allocate-frame
 	CONSTANT img1
 	
 	map CONSTANT map1
-	map1 img1 FITS_MAP !
+	map1 img1 FRAME_METADATA !
 		TSstring 3 timestamp drop 10	map1 =>" NIGHTOF"
 		UUIDString make-UUID 			map1 =>" UUID"		
 		s" 2500"								map1 =>" FOCUSPOS"
@@ -33,7 +33,7 @@ TSlength buffer: TSstring
 	img1 initialize-FITSfilepath
 	img1 FITS_FILEPATH_BUFFER buffer-to-string type CR		
 
-	img1 free-image
+	img1 free-frame
 	
 \ c" %idir%" $ExpandMacros $@ type
 \ CR

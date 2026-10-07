@@ -6,9 +6,9 @@ NEED simple-tester
 CR
 Tstart
 
-T{ 640 480 1 allocate-image CONSTANT img1 }T ==
+T{ 640 480 1 allocate-frame CONSTANT img1 }T ==
 	
-	img1 FITS_MAP @ CONSTANT map1
+	img1 FRAME_METADATA @ CONSTANT map1
 		s" 16" map1 =>" BITPIX"	
 		s" 2"	map1 =>" NAXIS"	
 		s" 640" map1 =>" NAXIS1"
@@ -26,8 +26,8 @@ T{ 640 480 1 allocate-image CONSTANT img1 }T ==
 ;
 	ASSIGN test_write-FITSfilepath TO-DO write-FITSfilepath
 	
-T{ img1 image_size }T 640 480 1 2* * * ==
-T{ img1 initialize-image }T ==
+T{ img1 frame-size }T 640 480 1 2* * * ==
+T{ img1 initialize-frame }T ==
 T{ img1 initialize-FITSimage }T ==
 T{ img1 initialize-FITSfilepath }T ==
 cr img1 FITS_FILEPATH_BUFFER
@@ -38,7 +38,7 @@ cr img1 FITS_FILEPATH_BUFFER
 	drop
 T{ img1 FITS_FILEPATH_BUFFER create-imageDirectory }T ==
 T{ img1 save-FITSimage }T ==
-T{ img1 free-image }T ==
+T{ img1 free-frame }T ==
 
 \ serialize XISF_test1.fitsand the reference file to buffers
 	s" e:\coding\ForthXISF\testdata\test1.fits" r/o open-file drop

@@ -39,17 +39,9 @@ s" second" projection.expected write-buffer drop
 13 projection.expected echo-buffer drop
 10 projection.expected echo-buffer drop
 
-4 3 1 allocate-image constant projection.image
-s" first" projection.image FITS_MAP @ =>" FIRST"
-s" second" projection.image FITS_MAP @ =>" SECOND"
-
-4 3 1 allocate-image constant filename.image
-s" 2026-10-06" filename.image FITS_MAP @ =>" NIGHTOF"
-s" Light" filename.image FITS_MAP @ =>" IMAGETYP"
-s" LUM" filename.image FITS_MAP @ =>" FILTER"
-s" 5" filename.image FITS_MAP @ =>" EXPTIME"
-0 0 filename.image FITS_MAP @ =>" FOCUSPOS"
-s" 01234567-89ab-cdef-0123-456789abcdef" filename.image FITS_MAP @ =>" UUID"
+4 3 1 allocate-frame constant projection.image
+s" first" projection.image FRAME_METADATA @ =>" FIRST"
+s" second" projection.image FRAME_METADATA @ =>" SECOND"
 
 Tstart
 
@@ -62,17 +54,9 @@ T{ publication.source publication.destination replace-file-atomically }T ==
 T{ publication.destination test.file-hash }T s" published" hashS ==
 T{ publication.source buffer-to-string FileExists? }T 0 ==
 
-T{ filename.image initialize-XISFfilepath
-   filename.image XISF_FILEPATH_BUFFER buffer-filename-to-string hashS
-}T s" LUM-E5-F-456789abcdef.xisf" hashS ==
-T{ filename.image initialize-FITSfilepath
-   filename.image FITS_FILEPATH_BUFFER buffer-filename-to-string hashS
-}T s" LUM-E5-F-456789abcdef.fits" hashS ==
-
 Tend
 
-projection.image free-image
-filename.image free-image
+projection.image free-frame
 projection.path free-buffer
 publication.source free-buffer
 publication.destination free-buffer

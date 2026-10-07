@@ -1,0 +1,78 @@
+\ Format-neutral in-memory astronomy frame.
+
+NEED ForthBase
+NEED FiniteFractions
+NEED buffers
+NEED forth-map
+
+256 constant FILEPATH_SIZE
+
+BEGIN-STRUCTURE FRAME
+                4   +FIELD FRAME_WIDTH
+                4   +FIELD FRAME_HEIGHT
+                4   +FIELD FRAME_DEPTH
+                4   +FIELD FRAME_SIZE_BYTES
+                4   +FIELD FRAME_METADATA
+                4   +FIELD FRAME_STATISTICS
+                0   +FIELD FRAME_BITMAP
+END-STRUCTURE
+
+FRAME constant FRAME_DESCRIPTOR
+
+: allocate-frame { width height depth | bytes frame -- frame }
+    width height depth 2* * * -> bytes
+    bytes FRAME_DESCRIPTOR + allocate abort" unable to allocate frame" -> frame
+    bytes frame FRAME_SIZE_BYTES !
+    depth frame FRAME_DEPTH !
+    height frame FRAME_HEIGHT !
+    width frame FRAME_WIDTH !
+    frame FRAME_BITMAP bytes erase
+    map frame FRAME_METADATA !
+    frame
+;
+
+: free-frame ( frame -- )
+    dup FRAME_STATISTICS @ ?dup if free drop then
+    free drop
+;
+
+: frame-size ( frame -- size-in-bytes )
+    FRAME_SIZE_BYTES @
+;
+
+: initialize-frame { frame | map x y -- }
+    frame FRAME_METADATA @ -> map
+    s" NAXIS1" map >integer -> x
+    s" NAXIS2" map >integer -> y
+    x frame FRAME_WIDTH !
+    y frame FRAME_HEIGHT !
+    x y * 2 * frame FRAME_SIZE_BYTES !
+;
+
+: IsFITSnumchar? ( c -- flag )
+    >R 0
+    R@ '+' = OR
+    R@ '-' = OR
+    R@ '.' = OR
+    R@ 'E' = OR
+    R@ 'e' = OR
+    R> '0' '9' within? OR
+;
+
+s" " $value FITSstringBuf
+
+: StrToFITSStr ( caddr u -- caddr u )
+    2dup -1 -rot over + swap do i c@ IsFITSnumchar? and dup 0= if leave then loop
+    0= if
+        s" '" $-> FITSstringBuf $+> FITSstringBuf s" '" $+> FITSstringBuf FITSstringBuf
+    then
+;
+
+: FITSstrToStr ( caddr u -- caddr u )
+    over c@ ''' = if 2 - swap 1 + swap then
+;
+
+: create-imageDirectory ( filepath-buffer -- )
+    >R
+    R@ buffer-drive-to-string R> buffer-dir-to-string makeDirLevels abort" cannot create image directory"
+;

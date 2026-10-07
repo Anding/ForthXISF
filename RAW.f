@@ -1,23 +1,4 @@
-\ save a 16-bit greyscale image as a raw 16 bit binary file
-
-DEFER write-RAWfilepath ( map buf --)
-
-: default_write-RAWfilepath { map buf -- }
-	s" e:\images\snapshot\" buf write-buffer drop	
-	buf buffer-punctuate-filepath
-	s" image.raw" buf write-buffer drop
-	0 buf echo-buffer drop                                   \ zero terminated string
-;
-
-    ASSIGN default_write-RAWfilepath TO-DO write-RAWfilepath
-    
-: initialize-RAWfilepath ( img --)
-	>R
-	R@ FITS_MAP @ ( map)
-	R> RAW_FILEPATH_BUFFER
-	FILEPATH_SIZE over ( map buf FILEPATH_SIZE buf) declare-buffer
-	( map buf) write-RAWfilepath
-;
+\ Save a 16-bit greyscale frame as a raw binary file at an explicit destination.
 
 : SaveBitmapAsBinary { bitmap width height caddr | fileid bitdepth t -- IOR }
     caddr zcount delete-file drop
@@ -33,12 +14,11 @@ DEFER write-RAWfilepath ( map buf --)
     fileid close-file ( IOR)
 ;
 
-: save-RAWimage { img -- }
-	img initialize-RAWfilepath
-	img RAW_FILEPATH_BUFFER create-imageDirectory
-    img IMAGE_BITMAP
-    img IMAGE_WIDTH @
-    img IMAGE_HEIGHT @
-    img RAW_FILEPATH_BUFFER buffer-to-string drop
+: save-RAWimage-to { frame filepath-buffer -- }
+    filepath-buffer create-imageDirectory
+    frame FRAME_BITMAP
+    frame FRAME_WIDTH @
+    frame FRAME_HEIGHT @
+    filepath-buffer buffer-to-string drop
     ( bitmap width height caddr) SaveBitmapAsBinary abort" Error writing RAW file"
 ;

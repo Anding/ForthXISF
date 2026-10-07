@@ -16,7 +16,7 @@
     filepath-buffer buffer-to-string w/o
         create-file abort" Cannot create FITS projection" -> fileid
     FITS_PROJECTION_SIZE allocate-buffer -> projection-buffer
-    projection-buffer ['] XISF.mapIterProjection img FITS_MAP @ simple-iterate-map drop
+    projection-buffer ['] XISF.mapIterProjection img FRAME_METADATA @ simple-iterate-map drop
     projection-buffer fileid buffer-to-file
     projection-buffer free-buffer
     fileid close-file abort" Cannot close FITS projection"

@@ -9,17 +9,17 @@ cr
 Tstart
 
 T{ s" BZERO   = 32768                                                                 " 
-    XISF.read-FITSline nip nip nip nip }T 0 ==
+    FITS.read-line nip nip nip nip }T 0 ==
 T{ s" BZERO   = 32768                                                                 " 
-    XISF.read-FITSline drop hashS -rot hashS swap }T s" 32768" hashS s" BZERO" hashS ==
+    FITS.read-line drop hashS -rot hashS swap }T s" 32768" hashS s" BZERO" hashS ==
 T{ s" INSTRUME= 'ZWO ASI6200MM Pro'                                                   " 
-    XISF.read-FITSline drop hashS -rot hashS swap }T s" ZWO ASI6200MM Pro" hashS s" INSTRUME" hashS ==
+    FITS.read-line drop hashS -rot hashS swap }T s" ZWO ASI6200MM Pro" hashS s" INSTRUME" hashS ==
 T{ s" INSTRUME  'ZWO ASI6200MM Pro'                                                   " 
-    XISF.read-FITSline }T 3 ==    
+    FITS.read-line }T 3 ==
 T{ s" END                                                                             " 
-    XISF.read-FITSline }T 1 ==
+    FITS.read-line }T 1 ==
 T{ s" SIMPLE  = T                                                                     " 
-    XISF.read-FITSline }T 2 ==
+    FITS.read-line }T 2 ==
 
 : test.XISF.scan-FITSgeometry ( caddr u -- width height depth )
     xisf.open-FITSfile 

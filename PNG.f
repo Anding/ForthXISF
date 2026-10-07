@@ -1,32 +1,10 @@
-\ save a 16-bit greyscale image as an 8-bit PNG file
+\ Save a 16-bit greyscale frame as an 8-bit PNG at an explicit destination.
 
-DEFER write-PNGfilepath ( map buf --)
-
-: default_write-PNGfilepath { map buf -- }
-	s" e:\images\snapshot\" buf write-buffer drop	
-	buf buffer-punctuate-filepath
-	s" image.png" buf write-buffer drop
-	0 buf echo-buffer drop                                   \ zero terminated string
-;
-
-    ASSIGN default_write-PNGfilepath TO-DO write-PNGfilepath
-    
-: initialize-PNGfilepath ( img --)
-	>R
-	R@ FITS_MAP @ ( map)
-	R> PNG_FILEPATH_BUFFER
-	FILEPATH_SIZE over ( map buf FILEPATH_SIZE buf) declare-buffer
-	( map buf) write-PNGfilepath
-;
-
-: save-PNGimage ( img -- )
-	>R
-	R@ initialize-PNGfilepath
-	R@ PNG_FILEPATH_BUFFER create-imageDirectory
-    R@ IMAGE_BITMAP
-    R@ IMAGE_WIDTH @
-    R@ IMAGE_HEIGHT @
-    R@ PNG_FILEPATH_BUFFER buffer-to-string drop
-    ( bitmap width height caddr) SaveBitmapAsPNG if ." Error writing PNG file" then
-    R> drop
+: save-PNGimage-to { frame filepath-buffer -- }
+    filepath-buffer create-imageDirectory
+    frame FRAME_BITMAP
+    frame FRAME_WIDTH @
+    frame FRAME_HEIGHT @
+    filepath-buffer buffer-to-string drop
+    SaveBitmapAsPNG abort" Error writing PNG file"
 ;

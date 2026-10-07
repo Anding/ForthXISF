@@ -1,6 +1,7 @@
 \ Ordered UTF-8 projection of a FITS map for metadata viewers and WCS sidecars.
 
-NEED ForthXISFCodec
+NEED ForthAstroFormats
+NEED ForthAtomicFile
 
 16384 constant FITS_PROJECTION_SIZE
 

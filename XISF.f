@@ -3,11 +3,6 @@
 NEED Frame
 NEED ForthXML
 
-LIBRARY: XISF.dll
-Extern: int "C" SaveBitmapAsPNG( int * bitmap, int width, int height, char * filename ) ;
-Extern: int "C" SaveBitmapAsBMP( int * bitmap, int width, int height, char * filename ) ;
-Extern: int "C" ReplaceFileAtomic( char * source, char * destination ) ;
-
 8192 constant XISF_HEADER_SIZE
 XISF_HEADER_SIZE allocate-buffer constant xisf.header-buffer
 

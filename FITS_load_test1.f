@@ -30,7 +30,7 @@ T{ s" SIMPLE  = T                                                               
     then
 ;
 
-T{ s" E:\coding\ForthXISF\testdata\test1.fits" test.XISF.scan-FITSgeometry }T 640 480 1 ==
+T{ s" E:\coding\ForthAstroFormats\testdata\test1.fits" test.XISF.scan-FITSgeometry }T 640 480 1 ==
 T{ s" E:\testdata\images\LUM-E8-F5100-12365844e78a.fits" test.XISF.scan-FITSgeometry }T 9576 6388 1 ==  
 
 : test.reverseConvertDataFITS
@@ -41,7 +41,7 @@ T{ s" E:\testdata\images\LUM-E8-F5100-12365844e78a.fits" test.XISF.scan-FITSgeom
 ;
 
 T{ test.reverseConvertDataFITS buf1 4096 hashS }T buf2 4096 2dup reverseConvertDataFITS hashS ==
-T{ s" E:\coding\ForthXISF\testdata\test1.fits" xisf.load-FITSfile swap -> image }T 0 ==
+T{ s" E:\coding\ForthAstroFormats\testdata\test1.fits" xisf.load-FITSfile swap -> image }T 0 ==
 T{ s" E:\testdata\images\LUM-E8-F5100-12365844e78a.fits" xisf.load-FITSfile swap -> image }T 0 ==
 CR
 Tend

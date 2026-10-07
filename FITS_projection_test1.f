@@ -25,9 +25,9 @@ need simple-tester
     buffer free-buffer
 ;
 
-s" E:\images\tests\forthxisf\projection.dat" projection.path write-buffer drop
-s" E:\images\tests\forthxisf\publication.tmp" publication.source write-buffer drop
-s" E:\images\tests\forthxisf\publication.dat" publication.destination write-buffer drop
+s" E:\images\tests\ForthAstroFormats\projection.dat" projection.path write-buffer drop
+s" E:\images\tests\ForthAstroFormats\publication.tmp" publication.source write-buffer drop
+s" E:\images\tests\ForthAstroFormats\publication.dat" publication.destination write-buffer drop
 s" FIRST" projection.expected write-buffer drop
 9 projection.expected echo-buffer drop
 s" first" projection.expected write-buffer drop

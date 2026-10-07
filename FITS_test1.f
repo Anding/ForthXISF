@@ -19,7 +19,7 @@ T{ 640 480 1 allocate-frame CONSTANT img1 }T ==
 	
 : test_write-FITSfilepath ( map buf -- )
 	>R drop
-	s" e:\coding\ForthXISF\testdata\" R@ write-buffer drop
+	s" e:\coding\ForthAstroFormats\testdata\" R@ write-buffer drop
 	R@ buffer-punctuate-filepath
 	s" test1.fits" R@ write-buffer drop
 	R> drop
@@ -41,12 +41,12 @@ T{ img1 save-FITSimage }T ==
 T{ img1 free-frame }T ==
 
 \ serialize XISF_test1.fitsand the reference file to buffers
-	s" e:\coding\ForthXISF\testdata\test1.fits" r/o open-file drop
+	s" e:\coding\ForthAstroFormats\testdata\test1.fits" r/o open-file drop
 	constant fileid1
 	fileid1 file-to-buffer
 	constant buf1
 	
-    s" e:\coding\ForthXISF\testdata\test1_reference.fits" r/o open-file drop
+    s" e:\coding\ForthAstroFormats\testdata\test1_reference.fits" r/o open-file drop
     constant fileid2
     fileid2 file-to-buffer
     constant buf2

@@ -19,7 +19,7 @@ include "%idir%\PNG.f"
     make-random.xisf -> image
     
 : test_write-PNGfilepath { map buf -- }
-	s" E:\coding\ForthXISF\testdata\" buf write-buffer drop	
+	s" E:\coding\ForthAstroFormats\testdata\" buf write-buffer drop
 	buf buffer-punctuate-filepath
 	s" random-image.png" buf write-buffer drop
 	0 buf echo-buffer drop                                   \ zero terminated string

@@ -5,7 +5,7 @@ need simple-tester
 
 : testA_write-XISFfilepath ( map buf -- )
 	>R drop
-	s" e:\coding\ForthXISF\testdata\" R@ write-buffer drop
+	s" e:\coding\ForthAstroFormats\testdata\" R@ write-buffer drop
 	R@ buffer-punctuate-filepath
 	s" test2.xisf" R@ write-buffer drop
 	R> drop
@@ -29,7 +29,7 @@ need simple-tester
     make-test2.xisf -> image1
 
 : test_write-XISFfilepath { map buf -- }
-	s" E:\coding\ForthXISF\testdata\" buf write-buffer drop
+	s" E:\coding\ForthAstroFormats\testdata\" buf write-buffer drop
 	buf buffer-punctuate-filepath
 	s" clone.xisf" buf write-buffer drop 
 ;
@@ -48,9 +48,9 @@ ASSIGN test_write-XISFfilepath TO-DO write-XISFfilepath
 cr 
 Tstart
 
-T{ s" E:\coding\ForthXISF\testdata\test2.xisf" test.xisf.load-file -> image2
-   s" E:\coding\ForthXISF\testdata\clone.xisf" hashF }T 
-   s" E:\coding\ForthXISF\testdata\test2.xisf" hashF ==
+T{ s" E:\coding\ForthAstroFormats\testdata\test2.xisf" test.xisf.load-file -> image2
+   s" E:\coding\ForthAstroFormats\testdata\clone.xisf" hashF }T
+   s" E:\coding\ForthAstroFormats\testdata\test2.xisf" hashF ==
    
 cr
 Tend

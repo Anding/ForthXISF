@@ -1,5 +1,7 @@
 \ Ordered UTF-8 projection of a FITS map for metadata viewers and WCS sidecars.
 
+NEED ForthXISFCodec
+
 16384 constant FITS_PROJECTION_SIZE
 
 : XISF.mapIterProjection { buf key-addr key-u map -- buf }
@@ -27,5 +29,9 @@
     0 destination-buffer echo-buffer abort" Publication destination path buffer full"
     source-buffer buffer-to-string drop
     destination-buffer buffer-to-string drop
-    ReplaceFileAtomic abort" Cannot replace publication manifest"
+    10 0 do
+        ReplaceFileAtomic 0= if unloop exit then
+        100 ms
+    loop
+    abort" Cannot replace publication manifest"
 ;

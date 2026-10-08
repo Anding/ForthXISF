@@ -28,6 +28,7 @@ FRAME constant FRAME_DESCRIPTOR
     width frame FRAME_WIDTH !
     frame FRAME_BITMAP bytes erase
     ordered-map frame FRAME_METADATA !
+    0 frame FRAME_STATISTICS !
     frame
 ;
 

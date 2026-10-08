@@ -6,6 +6,7 @@ NEED simple-tester
 Tstart
 
 T{ test-frame FRAME_METADATA @ ordered-map? }T -1 ==
+T{ test-frame FRAME_STATISTICS @ }T 0 ==
 
 s" first" test-frame FRAME_METADATA @ =>" FIRST"
 s" second" test-frame FRAME_METADATA @ =>" SECOND"

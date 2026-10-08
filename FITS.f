@@ -2,6 +2,8 @@
 
 11520 constant FITS_HEADER_SIZE
 FITS_HEADER_SIZE allocate-buffer constant fits.header-buffer
+16 2880 * constant FITS_TRANSFER_SIZE
+create fits.pixel-buffer FITS_TRANSFER_SIZE allot
 
 : FITS.map-iterate ( buf c-addr u map -- buf )
     >R rot R> swap >R
@@ -54,17 +56,34 @@ END-CODE
     s" END                                                                             " header-buffer write-buffer drop
 ;
 
-: save-FITSimage-to { frame filepath-buffer | fileid pixel-buffer padded-size -- }
+: FITS.write-pixels { frame fileid | source remaining chunk padding -- }
+\ Convert bounded chunks directly to the FITS byte order and unsigned offset.
+    frame FRAME_BITMAP -> source
+    frame frame-size -> remaining
+    begin
+        remaining
+    while
+        remaining FITS_TRANSFER_SIZE min -> chunk
+        source fits.pixel-buffer chunk convertDataFITS
+        fits.pixel-buffer chunk fileid write-file
+            abort" Cannot access FITS file"
+        source chunk + -> source
+        remaining chunk - -> remaining
+    repeat
+    frame FITS.padded-size frame frame-size - -> padding
+    padding if
+        fits.pixel-buffer padding erase
+        fits.pixel-buffer padding fileid write-file
+            abort" Cannot access FITS file"
+    then
+;
+
+: save-FITSimage-to { frame filepath-buffer | fileid -- }
     frame fits.header-buffer FITS.encode-header
     filepath-buffer create-imageDirectory
     filepath-buffer buffer-to-string w/o
         create-file abort" Cannot create FITS file" -> fileid
     fits.header-buffer BUFFER_ADDR FITS_HEADER_SIZE fileid write-file abort" Cannot access FITS file"
-    frame FITS.padded-size -> padded-size
-    padded-size allocate abort" unable to allocate FITS buffer" -> pixel-buffer
-    pixel-buffer padded-size erase
-    frame FRAME_BITMAP pixel-buffer frame frame-size convertDataFITS
-    pixel-buffer padded-size fileid write-file abort" Cannot access FITS file"
-    pixel-buffer free drop
+    frame fileid FITS.write-pixels
     fileid close-file abort" Cannot close FITS file"
 ;

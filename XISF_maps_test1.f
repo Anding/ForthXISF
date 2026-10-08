@@ -14,7 +14,6 @@ s" Takahashi Epsilon 160-ED" $-> rig.telescope
 18000 -> rig.aperature_area
 530 -> rig.focal_len
 
-s" Crab_nebula" $-> obs.object
 s" Patrick Moore" $-> obs.observer
 3 -> obs.type
 

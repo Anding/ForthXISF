@@ -1,8 +1,8 @@
 \ observation properties of an image
 
-\ IMAGETYP – type of image: Light Frame, Bias Frame, Dark Frame, Flat Frame, or Tricolor Image.
-\ OBJECT – name or catalog number of object being imaged, if available from Observatory Control Panel or specified by the user in Settings.
-\ OBSERVER – user-entered information; the observer’s name.
+\ IMAGETYP ï¿½ type of image: Light Frame, Bias Frame, Dark Frame, Flat Frame, or Tricolor Image.
+\ OBJECT - name or catalogue number derived from the acquired sky coordinates.
+\ OBSERVER ï¿½ user-entered information; the observerï¿½s name.
 
 
 0 value obs.type
@@ -30,7 +30,6 @@ BEGIN-ENUMS observationType
 	+" MasterLight"
 END-ENUMS
 
-s"  " $value obs.object
 s"  " $value obs.observer
 
 : frames	( n --)
@@ -40,8 +39,4 @@ s"  " $value obs.observer
 
 : frames? ( --)
 	obs.type observationType
-;
-
-: object ( caddr u --)
-	$-> obs.object
 ;

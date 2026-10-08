@@ -6,6 +6,7 @@
 ;
 
 : xisf.read-header { fileid -- }
+\ Read the complete fixed header so the file position lands at the attachment.
     xisf.header-buffer reset-buffer
     xisf.header-buffer XISF_HEADER_SIZE fileid buffer-read-file
     abort" Cannot read XISF header"
@@ -21,11 +22,15 @@
 ;
 
 : xisf.read-file { fileid frame -- }
+\ The caller has already consumed XISF_HEADER_SIZE bytes; read only the
+\ geometry-derived attachment and ignore any future trailing blocks.
     frame FRAME_BITMAP frame frame-size fileid read-file 2drop
     fileid close-file drop
 ;
 
 : xisf.scan-for-metadata { frame | map -- }
+\ Preserve document order by appending FITSKeyword elements to the frame's
+\ ordered map as they appear in the XISF header.
     frame FRAME_METADATA @ -> map
     xisf.header-buffer buffer-reset-search
     begin

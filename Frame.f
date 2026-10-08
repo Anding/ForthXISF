@@ -18,8 +18,13 @@ BEGIN-STRUCTURE FRAME
 END-STRUCTURE
 
 FRAME constant FRAME_DESCRIPTOR
+\ The descriptor and 16-bit pixel planes occupy one allocation. Metadata is a
+\ separately owned ordered map; statistics is either zero or an owned analysis
+\ allocation. free-frame releases all three ownership layers.
 
 : allocate-frame { width height depth | bytes frame -- frame }
+\ depth is the number of 16-bit planes. FRAME_BITMAP begins immediately after
+\ the descriptor so native camera and codec words can receive a plain address.
     width height depth 2* * * -> bytes
     bytes FRAME_DESCRIPTOR + allocate abort" unable to allocate frame" -> frame
     bytes frame FRAME_SIZE_BYTES !
@@ -47,6 +52,8 @@ FRAME constant FRAME_DESCRIPTOR
 ;
 
 : initialize-frame { frame | map x y -- }
+\ Camera download geometry may be smaller than the original full-frame
+\ allocation after subframing. This updates logical dimensions only.
     frame FRAME_METADATA @ -> map
     s" NAXIS1" map >integer -> x
     s" NAXIS2" map >integer -> y

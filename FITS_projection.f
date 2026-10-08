@@ -15,6 +15,8 @@ NEED ForthAtomicFile
 ;
 
 : save-FITSprojection { img filepath-buffer | fileid projection-buffer -- }
+\ Projection files are small transient publications, so one bounded buffer is
+\ allocated per write and released before returning.
     filepath-buffer create-imageDirectory
     filepath-buffer buffer-to-string w/o
         create-file abort" Cannot create FITS projection" -> fileid
@@ -26,6 +28,9 @@ NEED ForthAtomicFile
 ;
 
 : replace-file-atomically { source-buffer destination-buffer -- }
+\ Native replacement expects NUL-terminated paths. Prepared path buffers are
+\ single-use for this call; their recorded lengths include the appended NUL.
+\ Brief retries tolerate viewers holding the destination during replacement.
     0 source-buffer echo-buffer abort" Publication source path buffer full"
     0 destination-buffer echo-buffer abort" Publication destination path buffer full"
     10 0 do

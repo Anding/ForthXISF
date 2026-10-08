@@ -5,6 +5,8 @@ NEED ForthXML
 
 8192 constant XISF_HEADER_SIZE
 XISF_HEADER_SIZE allocate-buffer constant xisf.header-buffer
+\ The XML header occupies a fixed block and the pixel attachment begins at
+\ XISF_HEADER_SIZE. This shared scratch buffer makes the codec synchronous.
 
 : XISF.mapIterXISF ( buf c-addr u map -- buf )
     >R rot R> swap >R
@@ -20,6 +22,8 @@ XISF_HEADER_SIZE allocate-buffer constant xisf.header-buffer
 ;
 
 : XISF.encode-header { frame header-buffer -- }
+\ The attachment offset written into XML must remain equal to the exact fixed
+\ header size emitted by save-XISFimage-to.
     header-buffer reset-buffer
     s" XISF010000000000" header-buffer write-buffer abort" XISF header buffer full"
     header-buffer xml.<??>

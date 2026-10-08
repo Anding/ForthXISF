@@ -1,6 +1,8 @@
 \ FITS loading into a format-neutral FRAME.
 
 256 buffer: XISF.FITSloadline
+\ The loader accepts this project's 16-bit, two-axis primary images. It reuses
+\ the shared FITS header buffer and is therefore synchronous/non-reentrant.
 
 : xisf.open-FITSfile ( caddr u -- fileid 0 | ior )
     r/o open-file dup if ." Cannot open FITS file" then
@@ -20,6 +22,8 @@
 ;
 
 : XISF.scan-FITSgeometry { fileid | NAXIS1 NAXIS2 depth -- width height depth }
+\ FRAME depth is a plane count; the supported FITS NAXIS=2 image maps to one
+\ greyscale plane. Higher-dimensional FITS images are outside this codec.
     begin
         XISF.FITSloadline dup 80 fileid read-line drop
         0= if ." Unexpected EOF" 2drop 0 0 0 exit then
@@ -37,6 +41,7 @@
 ;
 
 CODE reverseConvertDataFITS ( src n -- )
+\ In-place inverse of convertDataFITS after reading the FITS pixel attachment.
     mov     edx, 0 [ebp]
     test    ebx, ebx
     jz      L$2
@@ -57,6 +62,8 @@ L$2:
 END-CODE
 
 : XISF.read-FITSfile { fileid frame -- }
+\ Re-read the fixed header into fits.header-buffer, then read exactly the
+\ logical frame bytes; FITS block padding is deliberately ignored.
     0 0 fileid reposition-file drop
     fits.header-buffer reset-buffer
     fits.header-buffer FITS_HEADER_SIZE fileid buffer-read-file 2drop

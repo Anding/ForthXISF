@@ -1,6 +1,8 @@
 \ Save a 16-bit greyscale frame as a raw binary file at an explicit destination.
 
 : SaveBitmapAsBinary { bitmap width height caddr | fileid bitdepth t -- IOR }
+\ AIMG is a deliberately small native interchange format: magic, width,
+\ height, bit depth, reserved cell, then host-endian 16-bit pixels.
     caddr zcount delete-file drop
     caddr zcount w/o create-file if -1 exit then -> fileid
     s" AIMG" fileid write-file drop

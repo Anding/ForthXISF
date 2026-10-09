@@ -60,7 +60,7 @@ XISF_HEADER_SIZE allocate-buffer constant xisf.header-buffer
 ;
 
 : save-XISFimage { frame filepath-buffer -- }
-\ Save through the active science-path policy and remember the resulting path.
-    frame s" .xisf" filepath-buffer write-science-filepath
+\ Save through the active filepath policy and remember the resulting path.
+    frame s" .xisf" filepath-buffer write-filepath
     frame filepath-buffer save-XISFimage-to
 ;

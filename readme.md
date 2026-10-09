@@ -51,29 +51,34 @@ The formats package owns this global root; an observatory environment may
 replace it with `$-> astro.root`.
 
 ```forth
-write-preview-image-filepath      ( frame filepath-buffer -- )
-write-preview-stretched-filepath  ( frame filepath-buffer -- )
-write-preview-histogram-filepath  ( frame filepath-buffer -- )
+write-preview-image-filepath      ( frame caddr u filepath-buffer -- )
+write-preview-stretched-filepath  ( frame caddr u filepath-buffer -- )
+write-preview-histogram-filepath  ( frame caddr u filepath-buffer -- )
 write-preview-manifest-filepath   ( frame caddr u filepath-buffer -- )
-write-metadata-filepath           ( frame filepath-buffer -- )
+write-metadata-filepath           ( frame caddr u filepath-buffer -- )
 write-metadata-manifest-filepath  ( frame caddr u filepath-buffer -- )
 write-science-filepath            ( frame caddr u filepath-buffer -- )
 ```
 
-Each word prepares the complete pathname. The default versioned composers
-read `UUID` from the frame FITS map and own all fixed viewer filenames.
-Callers supply only a suffix where one stem is shared by several files. Both
-`save-XISFimage` and `save-FITSimage` therefore use the same active science
-policy with different suffixes:
+Each word owns its filename stem and prepares the complete pathname using the
+suffix supplied by a filetype writer. Before calling a writer, orchestration
+assigns the selected filename creator to:
 
 ```forth
+write-filepath ( frame caddr u filepath-buffer -- )
+```
+
+The writer supplies its own extension. One assignment can therefore be reused
+for several filetypes:
+
+```forth
+ACTION-OF write-science-filepath TO-DO write-filepath
 save-XISFimage ( frame filepath-buffer -- )
 save-FITSimage ( frame filepath-buffer -- )
 ```
 
-A caller may temporarily replace `write-science-filepath`, for example to
-write a private solver FITS file, then restore the previous action before
-ordinary science publication.
+A private solver instead temporarily assigns its filename creator directly to
+`write-filepath`, calls the FITS writer, and restores the previous action.
 
 `NEED ForthPublication` loads the generic UUID-path and manifest record words.
 It owns atomic replacement mechanics; application code retains the policy

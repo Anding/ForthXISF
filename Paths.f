@@ -11,7 +11,8 @@ s" E:\images" $value astro.root
 ;
 
 : default-write-generation-filepath
-    { frame stream-addr stream-u filename-addr filename-u filepath-buffer -- }
+    { frame stream-addr stream-u filename-addr filename-u
+      suffix-addr suffix-u filepath-buffer -- }
 \ Build one complete UUID-versioned working filepath.
     filepath-buffer reset-buffer
     astro.root filepath-buffer write-buffer drop
@@ -19,10 +20,13 @@ s" E:\images" $value astro.root
     stream-addr stream-u filepath-buffer append-path
     s" UUID" frame FRAME_METADATA @ >string filepath-buffer append-path
     filename-addr filename-u filepath-buffer append-path
+    suffix-addr suffix-u filepath-buffer write-buffer
+        abort" Filepath buffer full"
 ;
 
 : default-write-manifest-filepath
-    { frame stream-addr stream-u filename-addr filename-u filepath-buffer -- }
+    { frame stream-addr stream-u filename-addr filename-u
+      suffix-addr suffix-u filepath-buffer -- }
 \ Build one complete working-stream manifest filepath.
     frame drop
     filepath-buffer reset-buffer
@@ -30,65 +34,69 @@ s" E:\images" $value astro.root
     s" working" filepath-buffer append-path
     stream-addr stream-u filepath-buffer append-path
     filename-addr filename-u filepath-buffer append-path
+    suffix-addr suffix-u filepath-buffer write-buffer
+        abort" Filepath buffer full"
 ;
 
-: default-write-preview-image-filepath { frame filepath-buffer -- }
-\ Build the complete raw-preview filepath.
-    frame s" preview" s" image.bmp" filepath-buffer
+: default-write-preview-image-filepath
+    { frame suffix-addr suffix-u filepath-buffer -- }
+\ Build the raw-preview pathname with the writer's suffix.
+    frame s" preview" s" image" suffix-addr suffix-u filepath-buffer
         default-write-generation-filepath
 ;
 
-DEFER write-preview-image-filepath ( frame filepath-buffer -- )
+DEFER write-preview-image-filepath ( frame caddr u filepath-buffer -- )
 ASSIGN default-write-preview-image-filepath
     TO-DO write-preview-image-filepath
 
-: default-write-preview-stretched-filepath { frame filepath-buffer -- }
-\ Build the complete stretched-preview filepath.
-    frame s" preview" s" stretched.bmp" filepath-buffer
+: default-write-preview-stretched-filepath
+    { frame suffix-addr suffix-u filepath-buffer -- }
+\ Build the stretched-preview pathname with the writer's suffix.
+    frame s" preview" s" stretched" suffix-addr suffix-u filepath-buffer
         default-write-generation-filepath
 ;
 
-DEFER write-preview-stretched-filepath ( frame filepath-buffer -- )
+DEFER write-preview-stretched-filepath ( frame caddr u filepath-buffer -- )
 ASSIGN default-write-preview-stretched-filepath
     TO-DO write-preview-stretched-filepath
 
-: default-write-preview-histogram-filepath { frame filepath-buffer -- }
-\ Build the complete preview-histogram filepath.
-    frame s" preview" s" histogram.bin" filepath-buffer
+: default-write-preview-histogram-filepath
+    { frame suffix-addr suffix-u filepath-buffer -- }
+\ Build the preview-histogram pathname with the writer's suffix.
+    frame s" preview" s" histogram" suffix-addr suffix-u filepath-buffer
         default-write-generation-filepath
 ;
 
-DEFER write-preview-histogram-filepath ( frame filepath-buffer -- )
+DEFER write-preview-histogram-filepath ( frame caddr u filepath-buffer -- )
 ASSIGN default-write-preview-histogram-filepath
     TO-DO write-preview-histogram-filepath
 
 : default-write-preview-manifest-filepath
     { frame suffix-addr suffix-u filepath-buffer -- }
 \ Build the preview-manifest filepath with the requested publication suffix.
-    frame s" preview" s" latest" filepath-buffer default-write-manifest-filepath
-    suffix-addr suffix-u filepath-buffer write-buffer
-        abort" Preview manifest filepath buffer full"
+    frame s" preview" s" latest" suffix-addr suffix-u filepath-buffer
+        default-write-manifest-filepath
 ;
 
 DEFER write-preview-manifest-filepath ( frame caddr u filepath-buffer -- )
 ASSIGN default-write-preview-manifest-filepath
     TO-DO write-preview-manifest-filepath
 
-: default-write-metadata-filepath { frame filepath-buffer -- }
-\ Build the complete FITS-key projection filepath.
-    frame s" metadata" s" fits.dat" filepath-buffer
+: default-write-metadata-filepath
+    { frame suffix-addr suffix-u filepath-buffer -- }
+\ Build the FITS-key projection pathname with the writer's suffix.
+    frame s" metadata" s" fits" suffix-addr suffix-u filepath-buffer
         default-write-generation-filepath
 ;
 
-DEFER write-metadata-filepath ( frame filepath-buffer -- )
+DEFER write-metadata-filepath ( frame caddr u filepath-buffer -- )
 ASSIGN default-write-metadata-filepath TO-DO write-metadata-filepath
 
 : default-write-metadata-manifest-filepath
     { frame suffix-addr suffix-u filepath-buffer -- }
 \ Build the metadata-manifest filepath with the requested publication suffix.
-    frame s" metadata" s" latest" filepath-buffer default-write-manifest-filepath
-    suffix-addr suffix-u filepath-buffer write-buffer
-        abort" Metadata manifest filepath buffer full"
+    frame s" metadata" s" latest" suffix-addr suffix-u filepath-buffer
+        default-write-manifest-filepath
 ;
 
 DEFER write-metadata-manifest-filepath ( frame caddr u filepath-buffer -- )
@@ -120,3 +128,6 @@ ASSIGN default-write-metadata-manifest-filepath
 
 DEFER write-science-filepath ( frame caddr u filepath-buffer -- )
 ASSIGN default-write-science-filepath TO-DO write-science-filepath
+
+DEFER write-filepath ( frame caddr u filepath-buffer -- )
+ASSIGN default-write-science-filepath TO-DO write-filepath

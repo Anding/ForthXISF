@@ -14,7 +14,7 @@ NEED ForthPublication
     buf
 ;
 
-: save-FITSprojection { img filepath-buffer | fileid projection-buffer -- }
+: save-FITSprojection-to { img filepath-buffer | fileid projection-buffer -- }
 \ Projection files are small transient publications, so one bounded buffer is
 \ allocated per write and released before returning.
     filepath-buffer create-imageDirectory
@@ -25,4 +25,16 @@ NEED ForthPublication
     projection-buffer fileid buffer-to-file
     projection-buffer free-buffer
     fileid close-file abort" Cannot close FITS projection"
+;
+
+: save-FITSprojection { img filepath-buffer -- }
+\ Save a viewer FITS-key projection through the active filepath policy.
+    img s" .dat" filepath-buffer write-filepath
+    img filepath-buffer save-FITSprojection-to
+;
+
+: save-WCSprojection { img filepath-buffer -- }
+\ Save a WCS sidecar through the active filepath policy.
+    img s" .wcs" filepath-buffer write-filepath
+    img filepath-buffer save-FITSprojection-to
 ;

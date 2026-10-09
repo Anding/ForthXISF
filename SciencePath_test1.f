@@ -16,8 +16,8 @@ FILEPATH_SIZE allocate-buffer constant science.test.xisf-path
     suffix-addr suffix-u filepath-buffer write-buffer drop
 ;
 
-ACTION-OF write-science-filepath constant science.test.saved-path
-ASSIGN science.test-write-filepath TO-DO write-science-filepath
+ACTION-OF write-filepath constant science.test.saved-path
+ASSIGN science.test-write-filepath TO-DO write-filepath
 
 test.make-frame -> science.test.frame
 science.test.frame science.test.xisf-path save-XISFimage
@@ -32,7 +32,7 @@ T{ science.test.xisf-path buffer-to-string FileExists? }T -1 ==
 T{ science.test.fits-path buffer-to-string FileExists? }T -1 ==
 Tend
 
-science.test.saved-path TO-DO write-science-filepath
+science.test.saved-path TO-DO write-filepath
 science.test.xisf-path buffer-to-string delete-file drop
 science.test.fits-path buffer-to-string delete-file drop
 science.test.frame free-frame

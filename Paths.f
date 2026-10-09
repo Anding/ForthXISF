@@ -4,6 +4,19 @@ NEED ForthBase
 
 s" E:\images" $value astro.root
 
+\ Writer-owned paths retain the most recently published artifacts.
+FILEPATH_SIZE allocate-buffer constant preview-BMPfilepath
+FILEPATH_SIZE allocate-buffer constant stretched-BMPfilepath
+FILEPATH_SIZE allocate-buffer constant histogram-filepath
+FILEPATH_SIZE allocate-buffer constant preview-manifest-filepath
+FILEPATH_SIZE allocate-buffer constant preview-manifest-tmp-filepath
+FILEPATH_SIZE allocate-buffer constant FITSprojection-filepath
+FILEPATH_SIZE allocate-buffer constant metadata-manifest-filepath
+FILEPATH_SIZE allocate-buffer constant metadata-manifest-tmp-filepath
+FILEPATH_SIZE allocate-buffer constant WCSfilepath
+FILEPATH_SIZE allocate-buffer constant XISFfilepath
+FILEPATH_SIZE allocate-buffer constant FITSfilepath
+
 : append-path { caddr u filepath-buffer -- }
 \ Append one backslash-separated component to a prepared pathname.
     '\' filepath-buffer echo-buffer abort" Filepath buffer full"
@@ -45,9 +58,9 @@ s" E:\images" $value astro.root
         default-write-generation-filepath
 ;
 
-DEFER write-preview-image-filepath ( frame caddr u filepath-buffer -- )
+DEFER write-filepath-bmp ( frame caddr u filepath-buffer -- )
 ASSIGN default-write-preview-image-filepath
-    TO-DO write-preview-image-filepath
+    TO-DO write-filepath-bmp
 
 : default-write-preview-stretched-filepath
     { frame suffix-addr suffix-u filepath-buffer -- }
@@ -56,9 +69,9 @@ ASSIGN default-write-preview-image-filepath
         default-write-generation-filepath
 ;
 
-DEFER write-preview-stretched-filepath ( frame caddr u filepath-buffer -- )
+DEFER write-filepath-stretched-bmp ( frame caddr u filepath-buffer -- )
 ASSIGN default-write-preview-stretched-filepath
-    TO-DO write-preview-stretched-filepath
+    TO-DO write-filepath-stretched-bmp
 
 : default-write-preview-histogram-filepath
     { frame suffix-addr suffix-u filepath-buffer -- }
@@ -67,9 +80,9 @@ ASSIGN default-write-preview-stretched-filepath
         default-write-generation-filepath
 ;
 
-DEFER write-preview-histogram-filepath ( frame caddr u filepath-buffer -- )
+DEFER write-filepath-histogram ( frame caddr u filepath-buffer -- )
 ASSIGN default-write-preview-histogram-filepath
-    TO-DO write-preview-histogram-filepath
+    TO-DO write-filepath-histogram
 
 : default-write-preview-manifest-filepath
     { frame suffix-addr suffix-u filepath-buffer -- }
@@ -78,9 +91,9 @@ ASSIGN default-write-preview-histogram-filepath
         default-write-manifest-filepath
 ;
 
-DEFER write-preview-manifest-filepath ( frame caddr u filepath-buffer -- )
+DEFER write-filepath-preview-manifest ( frame caddr u filepath-buffer -- )
 ASSIGN default-write-preview-manifest-filepath
-    TO-DO write-preview-manifest-filepath
+    TO-DO write-filepath-preview-manifest
 
 : default-write-metadata-filepath
     { frame suffix-addr suffix-u filepath-buffer -- }
@@ -89,8 +102,8 @@ ASSIGN default-write-preview-manifest-filepath
         default-write-generation-filepath
 ;
 
-DEFER write-metadata-filepath ( frame caddr u filepath-buffer -- )
-ASSIGN default-write-metadata-filepath TO-DO write-metadata-filepath
+DEFER write-filepath-fits-projection ( frame caddr u filepath-buffer -- )
+ASSIGN default-write-metadata-filepath TO-DO write-filepath-fits-projection
 
 : default-write-metadata-manifest-filepath
     { frame suffix-addr suffix-u filepath-buffer -- }
@@ -99,9 +112,9 @@ ASSIGN default-write-metadata-filepath TO-DO write-metadata-filepath
         default-write-manifest-filepath
 ;
 
-DEFER write-metadata-manifest-filepath ( frame caddr u filepath-buffer -- )
+DEFER write-filepath-metadata-manifest ( frame caddr u filepath-buffer -- )
 ASSIGN default-write-metadata-manifest-filepath
-    TO-DO write-metadata-manifest-filepath
+    TO-DO write-filepath-metadata-manifest
 
 : default-write-science-filepath
     { frame suffix-addr suffix-u filepath-buffer | map -- }
@@ -126,8 +139,11 @@ ASSIGN default-write-metadata-manifest-filepath
         abort" Science filepath buffer full"
 ;
 
-DEFER write-science-filepath ( frame caddr u filepath-buffer -- )
-ASSIGN default-write-science-filepath TO-DO write-science-filepath
+DEFER write-filepath-xisf ( frame caddr u filepath-buffer -- )
+ASSIGN default-write-science-filepath TO-DO write-filepath-xisf
 
-DEFER write-filepath ( frame caddr u filepath-buffer -- )
-ASSIGN default-write-science-filepath TO-DO write-filepath
+DEFER write-filepath-fits ( frame caddr u filepath-buffer -- )
+ASSIGN default-write-science-filepath TO-DO write-filepath-fits
+
+DEFER write-filepath-wcs ( frame caddr u filepath-buffer -- )
+ASSIGN default-write-science-filepath TO-DO write-filepath-wcs

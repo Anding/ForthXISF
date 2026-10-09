@@ -27,14 +27,14 @@ NEED ForthPublication
     fileid close-file abort" Cannot close FITS projection"
 ;
 
-: save-FITSprojection { img filepath-buffer -- }
-\ Save a viewer FITS-key projection through the active filepath policy.
-    img s" .dat" filepath-buffer write-filepath
-    img filepath-buffer save-FITSprojection-to
+: save-FITSprojection ( -- )
+\ Save the current frame's viewer projection through its dedicated writer.
+    image s" .dat" FITSprojection-filepath write-filepath-fits-projection
+    image FITSprojection-filepath save-FITSprojection-to
 ;
 
-: save-WCSprojection { img filepath-buffer -- }
-\ Save a WCS sidecar through the active filepath policy.
-    img s" .wcs" filepath-buffer write-filepath
-    img filepath-buffer save-FITSprojection-to
+: save-WCSprojection ( -- )
+\ Save the current frame's WCS sidecar through its dedicated writer.
+    image s" .wcs" WCSfilepath write-filepath-wcs
+    image WCSfilepath save-FITSprojection-to
 ;

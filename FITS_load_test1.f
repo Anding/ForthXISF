@@ -3,7 +3,7 @@ need simple-tester
 
 4096 buffer: buf1
 4096 buffer: buf2
-0 value image
+0 shared value image
 
 cr
 Tstart

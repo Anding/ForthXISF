@@ -95,8 +95,13 @@ END-CODE
     fileid close-file abort" Cannot close FITS file"
 ;
 
-: save-FITSimage { frame filepath-buffer -- }
-\ Save through the active filepath policy and remember the resulting path.
-    frame s" .fits" filepath-buffer write-filepath
+: save-FITSframe-to { frame filepath-buffer -- }
+\ Save a selected frame through the configured FITS writer.
+    frame s" .fits" filepath-buffer write-filepath-fits
     frame filepath-buffer save-FITSimage-to
+;
+
+: save-FITSimage ( -- )
+\ Save the current frame and retain its resulting FITS pathname.
+    image FITSfilepath save-FITSframe-to
 ;

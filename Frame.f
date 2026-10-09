@@ -4,6 +4,9 @@ NEED ForthBase
 NEED FiniteFractions
 NEED buffers
 NEED forth-map
+NEED Shared
+
+0 shared value image
 
 256 constant FILEPATH_SIZE
 

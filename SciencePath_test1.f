@@ -3,10 +3,6 @@
 NEED simple-tester
 include "%idir%\ForthAstroFormats_test_support.f"
 
-FILEPATH_SIZE allocate-buffer constant science.test.fits-path
-FILEPATH_SIZE allocate-buffer constant science.test.xisf-path
-0 value science.test.frame
-
 : science.test-write-filepath { frame suffix-addr suffix-u filepath-buffer -- }
 \ Direct both science formats to one deterministic test stem and suffix.
     frame drop
@@ -16,23 +12,26 @@ FILEPATH_SIZE allocate-buffer constant science.test.xisf-path
     suffix-addr suffix-u filepath-buffer write-buffer drop
 ;
 
-ACTION-OF write-filepath constant science.test.saved-path
-ASSIGN science.test-write-filepath TO-DO write-filepath
+ACTION-OF write-filepath-xisf constant science.test.saved-XISF-path
+ACTION-OF write-filepath-fits constant science.test.saved-FITS-path
+ASSIGN science.test-write-filepath TO-DO write-filepath-xisf
+ASSIGN science.test-write-filepath TO-DO write-filepath-fits
 
-test.make-frame -> science.test.frame
-science.test.frame science.test.xisf-path save-XISFimage
-science.test.frame science.test.fits-path save-FITSimage
+test.make-frame -> image
+save-XISFimage
+save-FITSimage
 
 Tstart
-T{ science.test.xisf-path buffer-to-string hashS
+T{ XISFfilepath buffer-to-string hashS
 }T s" E:\Coding\ForthAstroFormats\testdata\science-path.xisf" hashS ==
-T{ science.test.fits-path buffer-to-string hashS
+T{ FITSfilepath buffer-to-string hashS
 }T s" E:\Coding\ForthAstroFormats\testdata\science-path.fits" hashS ==
-T{ science.test.xisf-path buffer-to-string FileExists? }T -1 ==
-T{ science.test.fits-path buffer-to-string FileExists? }T -1 ==
+T{ XISFfilepath buffer-to-string FileExists? }T -1 ==
+T{ FITSfilepath buffer-to-string FileExists? }T -1 ==
 Tend
 
-science.test.saved-path TO-DO write-filepath
-science.test.xisf-path buffer-to-string delete-file drop
-science.test.fits-path buffer-to-string delete-file drop
-science.test.frame free-frame
+science.test.saved-XISF-path TO-DO write-filepath-xisf
+science.test.saved-FITS-path TO-DO write-filepath-fits
+XISFfilepath buffer-to-string delete-file drop
+FITSfilepath buffer-to-string delete-file drop
+image free-frame

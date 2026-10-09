@@ -10,9 +10,9 @@ https://pixinsight.com/doc/docs/XISF-1.0-spec/XISF-1.0-spec.html
 preview, analysis, and solver code. `IMAGE_DESCRIPTOR` remains an alias for
 compatibility with existing callers.
 
-The context owns dimensions, pixel data, a `FITS_MAP`, image statistics, and
-path buffers. Writers update or project the existing ordered FITS map rather
-than maintaining separate metadata objects.
+The context owns dimensions, pixel data, a `FITS_MAP`, and image statistics.
+Writers retain their own output paths and update or project the existing
+ordered FITS map rather than maintaining separate metadata objects.
 
 ## FITS projection and publication
 
@@ -25,14 +25,15 @@ NEED FITS_projection
 The public words are:
 
 ```forth
-save-FITSprojection ( img filepath-buffer -- )
+save-FITSprojection    ( -- )
+save-FITSprojection-to ( img filepath-buffer -- )
 replace-file-atomically ( source-buffer destination-buffer -- )
 ```
 
-`save-FITSprojection` creates the selected directory and writes the image
-context's ordered FITS map as UTF-8 `key<TAB>value<CRLF>` lines. It uses an
-in-memory buffer before writing the file, avoiding direct map-iterator file
-output.
+`save-FITSprojection` writes the shared current image through its dedicated
+pathname policy and retains the resulting path. `save-FITSprojection-to` is
+the explicit low-level form. Both write the ordered FITS map as UTF-8
+`key<TAB>value<CRLF>` lines through an in-memory buffer.
 
 `replace-file-atomically` expects ForthBase buffer descriptors containing
 source and destination paths. It appends the required NUL terminators and
@@ -51,38 +52,33 @@ The formats package owns this global root; an observatory environment may
 replace it with `$-> astro.root`.
 
 ```forth
-write-preview-image-filepath      ( frame caddr u filepath-buffer -- )
-write-preview-stretched-filepath  ( frame caddr u filepath-buffer -- )
-write-preview-histogram-filepath  ( frame caddr u filepath-buffer -- )
-write-preview-manifest-filepath   ( frame caddr u filepath-buffer -- )
-write-metadata-filepath           ( frame caddr u filepath-buffer -- )
-write-metadata-manifest-filepath  ( frame caddr u filepath-buffer -- )
-write-science-filepath            ( frame caddr u filepath-buffer -- )
+write-filepath-bmp                ( frame caddr u filepath-buffer -- )
+write-filepath-stretched-bmp      ( frame caddr u filepath-buffer -- )
+write-filepath-histogram          ( frame caddr u filepath-buffer -- )
+write-filepath-preview-manifest   ( frame caddr u filepath-buffer -- )
+write-filepath-fits-projection    ( frame caddr u filepath-buffer -- )
+write-filepath-metadata-manifest  ( frame caddr u filepath-buffer -- )
+write-filepath-xisf               ( frame caddr u filepath-buffer -- )
+write-filepath-fits               ( frame caddr u filepath-buffer -- )
+write-filepath-wcs                ( frame caddr u filepath-buffer -- )
 ```
 
-Each word owns its filename stem and prepares the complete pathname using the
-suffix supplied by a filetype writer. Before calling a writer, orchestration
-assigns the selected filename creator to:
+Each writer owns its dedicated deferred pathname creator, retained filepath
+buffer, extension, and file I/O. Defaults are assigned when the formats
+library loads, so ordinary orchestration only invokes the zero-argument
+writers:
 
 ```forth
-write-filepath ( frame caddr u filepath-buffer -- )
+save-XISFimage
+save-FITSimage
 ```
 
-The writer supplies its own extension. One assignment can therefore be reused
-for several filetypes:
-
-```forth
-ACTION-OF write-science-filepath TO-DO write-filepath
-save-XISFimage ( frame filepath-buffer -- )
-save-FITSimage ( frame filepath-buffer -- )
-```
-
-A private solver instead temporarily assigns its filename creator directly to
-`write-filepath`, calls the FITS writer, and restores the previous action.
+A private solver temporarily replaces only `write-filepath-fits`, calls
+`save-FITSframe-to`, and restores the previous action.
 
 `NEED ForthPublication` loads the generic UUID-path and manifest record words.
-It owns atomic replacement mechanics; application code retains the policy
-deciding which products and manifest keys to publish.
+It owns binary output, manifest publication, and atomic replacement mechanics.
+`NEED ForthPreview` loads the stretched-BMP and histogram writers.
 
 VFXterm is a 32-bit process and must be able to load the Win32 Release
 `XISF.dll`. Deploy

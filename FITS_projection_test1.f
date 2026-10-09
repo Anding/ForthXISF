@@ -9,17 +9,6 @@ need simple-tester
 256 allocate-buffer constant publication.destination
 256 allocate-buffer constant projection.expected
 
-: test.write-projection-filepath
-    { frame suffix-addr suffix-u filepath-buffer -- }
-    frame drop
-    filepath-buffer reset-buffer
-    s" E:\images\tests\ForthAstroFormats\projection"
-        filepath-buffer write-buffer drop
-    suffix-addr suffix-u filepath-buffer write-buffer drop
-;
-
-ASSIGN test.write-projection-filepath TO-DO write-filepath
-
 : test.write-file { caddr u filepath-buffer | fileid -- }
     filepath-buffer create-imageDirectory
     filepath-buffer buffer-to-string w/o
@@ -38,6 +27,7 @@ ASSIGN test.write-projection-filepath TO-DO write-filepath
 
 s" E:\images\tests\ForthAstroFormats\publication.tmp" publication.source write-buffer drop
 s" E:\images\tests\ForthAstroFormats\publication.dat" publication.destination write-buffer drop
+s" E:\images\tests\ForthAstroFormats\projection.dat" projection.path write-buffer drop
 s" FIRST" projection.expected write-buffer drop
 9 projection.expected echo-buffer drop
 s" first" projection.expected write-buffer drop
@@ -55,7 +45,7 @@ s" second" projection.image FRAME_METADATA @ =>" SECOND"
 
 Tstart
 
-T{ projection.image projection.path save-FITSprojection }T ==
+T{ projection.image projection.path save-FITSprojection-to }T ==
 T{ projection.path test.file-hash }T projection.expected buffer-to-string hashS ==
 
 s" old" publication.destination test.write-file

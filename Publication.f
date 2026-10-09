@@ -51,10 +51,9 @@ NEED ForthAtomicFile
     abort" Cannot replace publication manifest"
 ;
 
-: save-binary-file
-    { frame data-addr data-u filepath-buffer | fileid -- }
-\ Save one binary artifact through the active binary filepath policy.
-    frame s" .bin" filepath-buffer write-filepath
+: save-binary-file-to
+    { data-addr data-u filepath-buffer | fileid -- }
+\ Save one binary artifact to an explicitly prepared pathname.
     filepath-buffer create-imageDirectory
     filepath-buffer buffer-to-string w/o
         create-file abort" Cannot create binary publication" -> fileid
@@ -62,40 +61,46 @@ NEED ForthAtomicFile
     fileid close-file abort" Cannot close binary publication"
 ;
 
-: publish-preview-manifest
-    { frame raw-path stretched-path histogram-path preview? histogram?
-      manifest-path manifest-tmp-path | fileid -- }
+: publish-preview-manifest { preview? histogram? | fileid -- }
 \ Atomically publish the paths of the selected preview artifacts.
-    frame s" .dat" manifest-path write-filepath
-    frame s" .tmp" manifest-tmp-path write-filepath
-    manifest-tmp-path open-publication-file -> fileid
+    image s" .dat" preview-manifest-filepath
+        write-filepath-preview-manifest
+    image s" .tmp" preview-manifest-tmp-filepath
+        write-filepath-preview-manifest
+    preview-manifest-tmp-filepath open-publication-file -> fileid
     preview? if
-        fileid s" image filepath" raw-path write-path-manifest-line
-        fileid s" stretched image filepath" stretched-path
+        fileid s" image filepath" preview-BMPfilepath
+            write-path-manifest-line
+        fileid s" stretched image filepath" stretched-BMPfilepath
             write-path-manifest-line
     then
     histogram? if
-        fileid s" histogram filepath" histogram-path write-path-manifest-line
+        fileid s" histogram filepath" histogram-filepath
+            write-path-manifest-line
     then
-    fileid s" image name" s" UUID" frame FRAME_METADATA @ >string
+    fileid s" image name" s" UUID" image FRAME_METADATA @ >string
         write-manifest-line
-    fileid s" time-stamp" s" DATE-END" frame FRAME_METADATA @ >string
+    fileid s" time-stamp" s" DATE-END" image FRAME_METADATA @ >string
         write-manifest-line
     fileid close-file abort" Cannot close manifest"
-    manifest-tmp-path manifest-path replace-file-atomically
+    preview-manifest-tmp-filepath preview-manifest-filepath
+        replace-file-atomically
 ;
 
-: publish-metadata-manifest
-    { frame metadata-path manifest-path manifest-tmp-path | fileid -- }
+: publish-metadata-manifest { | fileid -- }
 \ Atomically publish the current FITS-key projection path.
-    frame s" .dat" manifest-path write-filepath
-    frame s" .tmp" manifest-tmp-path write-filepath
-    manifest-tmp-path open-publication-file -> fileid
-    fileid s" fits keys filepath" metadata-path write-path-manifest-line
-    fileid s" image name" s" UUID" frame FRAME_METADATA @ >string
+    image s" .dat" metadata-manifest-filepath
+        write-filepath-metadata-manifest
+    image s" .tmp" metadata-manifest-tmp-filepath
+        write-filepath-metadata-manifest
+    metadata-manifest-tmp-filepath open-publication-file -> fileid
+    fileid s" fits keys filepath" FITSprojection-filepath
+        write-path-manifest-line
+    fileid s" image name" s" UUID" image FRAME_METADATA @ >string
         write-manifest-line
-    fileid s" time-stamp" s" DATE-END" frame FRAME_METADATA @ >string
+    fileid s" time-stamp" s" DATE-END" image FRAME_METADATA @ >string
         write-manifest-line
     fileid close-file abort" Cannot close manifest"
-    manifest-tmp-path manifest-path replace-file-atomically
+    metadata-manifest-tmp-filepath metadata-manifest-filepath
+        replace-file-atomically
 ;

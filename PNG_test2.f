@@ -1,7 +1,7 @@
 need forthXISF
 include "%idir%\PNG.f"
 
-0 value image
+0 shared value image
 
 s" E:\testdata\images\LUM-E155-F5100-f7843758a3f5.xisf" xisf.load-file drop -> image
     

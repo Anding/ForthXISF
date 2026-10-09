@@ -59,8 +59,13 @@ XISF_HEADER_SIZE allocate-buffer constant xisf.header-buffer
     fileid close-file abort" Cannot close XISF file"
 ;
 
-: save-XISFimage { frame filepath-buffer -- }
-\ Save through the active filepath policy and remember the resulting path.
-    frame s" .xisf" filepath-buffer write-filepath
+: save-XISFframe-to { frame filepath-buffer -- }
+\ Save a selected frame through the configured XISF writer.
+    frame s" .xisf" filepath-buffer write-filepath-xisf
     frame filepath-buffer save-XISFimage-to
+;
+
+: save-XISFimage ( -- )
+\ Save the current frame and retain its resulting XISF pathname.
+    image XISFfilepath save-XISFframe-to
 ;

@@ -85,6 +85,7 @@ END-CODE
 ;
 
 : save-FITSimage-to { frame filepath-buffer | fileid -- }
+\ Save a FITS frame to an explicitly prepared pathname.
     frame fits.header-buffer FITS.encode-header
     filepath-buffer create-imageDirectory
     filepath-buffer buffer-to-string w/o
@@ -92,4 +93,11 @@ END-CODE
     fits.header-buffer BUFFER_ADDR FITS_HEADER_SIZE fileid write-file abort" Cannot access FITS file"
     frame fileid FITS.write-pixels
     fileid close-file abort" Cannot close FITS file"
+;
+
+: save-FITSimage { frame filepath-buffer -- }
+\ Save through the active science-path policy and remember the resulting path.
+    frame filepath-buffer write-science-filepath
+    s" .fits" filepath-buffer write-buffer abort" FITS filepath buffer full"
+    frame filepath-buffer save-FITSimage-to
 ;

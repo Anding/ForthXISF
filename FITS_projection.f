@@ -1,7 +1,7 @@
 \ Ordered UTF-8 projection of a FITS map for metadata viewers and WCS sidecars.
 
 NEED ForthAstroFormats
-NEED ForthAtomicFile
+NEED ForthPublication
 
 16384 constant FITS_PROJECTION_SIZE
 
@@ -25,19 +25,4 @@ NEED ForthAtomicFile
     projection-buffer fileid buffer-to-file
     projection-buffer free-buffer
     fileid close-file abort" Cannot close FITS projection"
-;
-
-: replace-file-atomically { source-buffer destination-buffer -- }
-\ Native replacement expects NUL-terminated paths. Prepared path buffers are
-\ single-use for this call; their recorded lengths include the appended NUL.
-\ Brief retries tolerate viewers holding the destination during replacement.
-    0 source-buffer echo-buffer abort" Publication source path buffer full"
-    0 destination-buffer echo-buffer abort" Publication destination path buffer full"
-    10 0 do
-        source-buffer buffer-to-string drop
-        destination-buffer buffer-to-string drop
-        ReplaceFileAtomic 0= if unloop exit then
-        100 ms
-    loop
-    abort" Cannot replace publication manifest"
 ;

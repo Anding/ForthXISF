@@ -49,6 +49,7 @@ XISF_HEADER_SIZE allocate-buffer constant xisf.header-buffer
 ;
 
 : save-XISFimage-to { frame filepath-buffer | fileid -- }
+\ Save an XISF frame to an explicitly prepared pathname.
     frame xisf.header-buffer XISF.encode-header
     filepath-buffer create-imageDirectory
     filepath-buffer buffer-to-string w/o
@@ -56,4 +57,11 @@ XISF_HEADER_SIZE allocate-buffer constant xisf.header-buffer
     xisf.header-buffer BUFFER_ADDR XISF_HEADER_SIZE fileid write-file abort" Cannot access XISF file"
     frame FRAME_BITMAP frame frame-size fileid write-file abort" Cannot access XISF file"
     fileid close-file abort" Cannot close XISF file"
+;
+
+: save-XISFimage { frame filepath-buffer -- }
+\ Save through the active science-path policy and remember the resulting path.
+    frame filepath-buffer write-science-filepath
+    s" .xisf" filepath-buffer write-buffer abort" XISF filepath buffer full"
+    frame filepath-buffer save-XISFimage-to
 ;

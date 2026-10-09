@@ -39,6 +39,34 @@ source and destination paths. It appends the required NUL terminators and
 uses the native `ReplaceFileAtomic` export, which replaces the destination
 only after a completed temporary manifest exists.
 
+## Output pathname policy
+
+`ForthAstroFormats` provides three replaceable stream path writers:
+
+```forth
+write-preview-root       ( frame filepath-buffer -- )
+write-metadata-root      ( frame filepath-buffer -- )
+write-science-filepath   ( frame filepath-buffer -- )
+```
+
+The preview and metadata words prepare stream roots. The science word prepares
+a complete pathname stem; format writers append their own extension. Both
+`save-XISFimage` and `save-FITSimage` therefore use the same active science
+policy:
+
+```forth
+save-XISFimage ( frame filepath-buffer -- )
+save-FITSimage ( frame filepath-buffer -- )
+```
+
+A caller may temporarily replace `write-science-filepath`, for example to
+write a private solver FITS file, then restore the previous action before
+ordinary science publication.
+
+`NEED ForthPublication` loads the generic UUID-path and manifest record words.
+It owns atomic replacement mechanics; application code retains the policy
+deciding which products and manifest keys to publish.
+
 VFXterm is a 32-bit process and must be able to load the Win32 Release
 `XISF.dll`. Deploy
 `XISF_project\Release\XISF.dll` beside `VFXterm.exe` before exercising any

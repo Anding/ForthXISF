@@ -1,13 +1,7 @@
-\ Generic pathname and manifest mechanics for replaceable publications.
+\ Generic manifest mechanics for replaceable publications.
 
 NEED ForthAstroFormats
 NEED ForthAtomicFile
-
-: append-frame-filepath { frame caddr u filepath-buffer -- }
-\ Append a frame UUID generation and filename to a stream root.
-    s" UUID" frame FRAME_METADATA @ >string filepath-buffer append-path
-    caddr u filepath-buffer append-path
-;
 
 : open-publication-file { filepath-buffer | fileid -- fileid }
 \ Create the selected publication file and any missing parent directories.
@@ -25,14 +19,22 @@ NEED ForthAtomicFile
     s\" \"\r\n" fileid write-file abort" Cannot write manifest"
 ;
 
-: write-frame-manifest-line { fileid key-addr key-u filename-addr filename-u frame | uuid-addr uuid-u -- }
-\ Write one manifest record relative to the frame UUID generation.
+: write-manifest-path { filepath-buffer fileid -- }
+\ Write a Windows pathname as a JSON-style string value.
+    filepath-buffer buffer-to-string bounds ?do
+        i c@ '\' = if
+            s" \\" fileid write-file abort" Cannot write manifest"
+        else
+            i 1 fileid write-file abort" Cannot write manifest"
+        then
+    loop
+;
+
+: write-path-manifest-line { fileid key-addr key-u filepath-buffer -- }
+\ Write one manifest record containing an authoritative generated filepath.
     key-addr key-u fileid write-file abort" Cannot write manifest"
     s\" : \"" fileid write-file abort" Cannot write manifest"
-    s" UUID" frame FRAME_METADATA @ >string -> uuid-u -> uuid-addr
-    uuid-addr uuid-u fileid write-file abort" Cannot write manifest"
-    s" \" fileid write-file abort" Cannot write manifest"
-    filename-addr filename-u fileid write-file abort" Cannot write manifest"
+    filepath-buffer fileid write-manifest-path
     s\" \"\r\n" fileid write-file abort" Cannot write manifest"
 ;
 

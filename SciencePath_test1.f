@@ -7,12 +7,13 @@ FILEPATH_SIZE allocate-buffer constant science.test.fits-path
 FILEPATH_SIZE allocate-buffer constant science.test.xisf-path
 0 value science.test.frame
 
-: science.test-write-filepath { frame filepath-buffer -- }
-\ Direct both science formats to one deterministic test stem.
+: science.test-write-filepath { frame suffix-addr suffix-u filepath-buffer -- }
+\ Direct both science formats to one deterministic test stem and suffix.
     frame drop
     filepath-buffer reset-buffer
     s" E:\Coding\ForthAstroFormats\testdata\science-path"
         filepath-buffer write-buffer drop
+    suffix-addr suffix-u filepath-buffer write-buffer drop
 ;
 
 ACTION-OF write-science-filepath constant science.test.saved-path

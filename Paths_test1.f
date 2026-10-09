@@ -5,14 +5,11 @@ FILEPATH_SIZE allocate-buffer constant paths.test.filepath
 
 Tstart
 
-T{ astro.working-root hashS }T s" E:\images\working" hashS ==
-T{ astro.science-root hashS }T s" E:\images" hashS ==
+T{ astro.root hashS }T s" E:\images" hashS ==
 
-s" E:\test-working" $-> astro.working-root
-s" E:\test-science" $-> astro.science-root
+s" E:\test-images" $-> astro.root
 
-T{ astro.working-root hashS }T s" E:\test-working" hashS ==
-T{ astro.science-root hashS }T s" E:\test-science" hashS ==
+T{ astro.root hashS }T s" E:\test-images" hashS ==
 
 1 1 1 allocate-frame constant paths.test.frame
 s" 11111111-2222-3333-4444-555555555555"
@@ -23,17 +20,34 @@ s" LUM" paths.test.frame FRAME_METADATA @ =>" FILTER"
 s" 5" paths.test.frame FRAME_METADATA @ =>" EXPTIME"
 s" 5100" paths.test.frame FRAME_METADATA @ =>" FOCUSPOS"
 
-T{ paths.test.frame paths.test.filepath write-preview-root
+T{ paths.test.frame paths.test.filepath write-preview-image-filepath
    paths.test.filepath buffer-to-string hashS
-}T s" E:\test-working\preview" hashS ==
+}T s" E:\test-images\working\preview\11111111-2222-3333-4444-555555555555\image.bmp" hashS ==
 
-T{ paths.test.frame paths.test.filepath write-metadata-root
+T{ paths.test.frame paths.test.filepath write-preview-stretched-filepath
    paths.test.filepath buffer-to-string hashS
-}T s" E:\test-working\metadata" hashS ==
+}T s" E:\test-images\working\preview\11111111-2222-3333-4444-555555555555\stretched.bmp" hashS ==
 
-T{ paths.test.frame paths.test.filepath write-science-filepath
+T{ paths.test.frame paths.test.filepath write-preview-histogram-filepath
    paths.test.filepath buffer-to-string hashS
-}T s" E:\test-science\2026-10-09\Dark\LUM-E5-F5100-555555555555" hashS ==
+}T s" E:\test-images\working\preview\11111111-2222-3333-4444-555555555555\histogram.bin" hashS ==
+
+T{ paths.test.frame s" .dat" paths.test.filepath
+   write-preview-manifest-filepath paths.test.filepath buffer-to-string hashS
+}T s" E:\test-images\working\preview\latest.dat" hashS ==
+
+T{ paths.test.frame paths.test.filepath write-metadata-filepath
+   paths.test.filepath buffer-to-string hashS
+}T s" E:\test-images\working\metadata\11111111-2222-3333-4444-555555555555\fits.dat" hashS ==
+
+T{ paths.test.frame s" .tmp" paths.test.filepath
+   write-metadata-manifest-filepath
+   paths.test.filepath buffer-to-string hashS
+}T s" E:\test-images\working\metadata\latest.tmp" hashS ==
+
+T{ paths.test.frame s" .fits" paths.test.filepath write-science-filepath
+   paths.test.filepath buffer-to-string hashS
+}T s" E:\test-images\2026-10-09\Dark\LUM-E5-F5100-555555555555.fits" hashS ==
 
 paths.test.frame free-frame
 

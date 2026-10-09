@@ -41,18 +41,30 @@ only after a completed temporary manifest exists.
 
 ## Output pathname policy
 
-`ForthAstroFormats` provides three replaceable stream path writers:
+`ForthAstroFormats` provides replaceable complete-path composers:
 
 ```forth
-write-preview-root       ( frame filepath-buffer -- )
-write-metadata-root      ( frame filepath-buffer -- )
-write-science-filepath   ( frame filepath-buffer -- )
+s" E:\images" $value astro.root
 ```
 
-The preview and metadata words prepare stream roots. The science word prepares
-a complete pathname stem; format writers append their own extension. Both
+The formats package owns this global root; an observatory environment may
+replace it with `$-> astro.root`.
+
+```forth
+write-preview-image-filepath      ( frame filepath-buffer -- )
+write-preview-stretched-filepath  ( frame filepath-buffer -- )
+write-preview-histogram-filepath  ( frame filepath-buffer -- )
+write-preview-manifest-filepath   ( frame caddr u filepath-buffer -- )
+write-metadata-filepath           ( frame filepath-buffer -- )
+write-metadata-manifest-filepath  ( frame caddr u filepath-buffer -- )
+write-science-filepath            ( frame caddr u filepath-buffer -- )
+```
+
+Each word prepares the complete pathname. The default versioned composers
+read `UUID` from the frame FITS map and own all fixed viewer filenames.
+Callers supply only a suffix where one stem is shared by several files. Both
 `save-XISFimage` and `save-FITSimage` therefore use the same active science
-policy:
+policy with different suffixes:
 
 ```forth
 save-XISFimage ( frame filepath-buffer -- )

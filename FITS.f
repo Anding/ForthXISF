@@ -97,7 +97,6 @@ END-CODE
 
 : save-FITSimage { frame filepath-buffer -- }
 \ Save through the active science-path policy and remember the resulting path.
-    frame filepath-buffer write-science-filepath
-    s" .fits" filepath-buffer write-buffer abort" FITS filepath buffer full"
+    frame s" .fits" filepath-buffer write-science-filepath
     frame filepath-buffer save-FITSimage-to
 ;

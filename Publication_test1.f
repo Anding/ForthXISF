@@ -24,17 +24,16 @@ s" 11111111-2222-3333-4444-555555555555"
         publication.test.filepath write-buffer drop
     publication.test.filepath open-publication-file -> fileid
     fileid s" image name" s" test-image" write-manifest-line
-    fileid s" image filepath" s" image.bmp"
-        publication.test.frame write-frame-manifest-line
+    fileid s" image filepath" publication.test.filepath
+        write-path-manifest-line
     fileid close-file abort" Cannot close publication test file"
 ;
 
 : publication.test-versioned-path ( -- caddr u )
 \ Build one representative UUID-versioned publication pathname.
     publication.test.filepath reset-buffer
-    s" E:\stream" publication.test.filepath write-buffer drop
-    publication.test.frame s" image.bmp" publication.test.filepath
-        append-frame-filepath
+    s" E:\stream\11111111-2222-3333-4444-555555555555\image.bmp"
+        publication.test.filepath write-buffer drop
     publication.test.filepath buffer-to-string
 ;
 
@@ -44,9 +43,8 @@ T{ publication.test-versioned-path hashS
 }T s" E:\stream\11111111-2222-3333-4444-555555555555\image.bmp" hashS ==
 
 T{ publication.test-write }T ==
-T{ publication.test.filepath s" test-image" publication.test-contains? }T -1 ==
 T{ publication.test.filepath
-   s" 11111111-2222-3333-4444-555555555555\image.bmp"
+   s" E:\\Coding\\ForthAstroFormats\\testdata\\publication.dat"
    publication.test-contains?
 }T -1 ==
 

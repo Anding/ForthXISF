@@ -31,6 +31,7 @@ BEGIN-ENUMS observationType
 END-ENUMS
 
 s"  " $value obs.observer
+s"  " $value obs.target
 
 : frames	( n --)
 \ set the bias, dark, flat, light frame type

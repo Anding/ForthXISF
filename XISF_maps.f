@@ -13,6 +13,7 @@ TSlength buffer: xisf.TSstring
 	>R
 	s"  "                                   R@ =>" #OBS"            \ a header to indicate the source of these FITS values	
  	obs.type observationType                R@ =>" IMAGETYP"	
+	obs.target                              R@ =>" TARGET"
 	0 0                                     R@ =>" OBJECT"
 	xisf.TSstring 0 make-timestamp          R@ =>" DATE-OBS"        \ UTC date and time in ISO format
 	xisf.TSstring 1 make-timestamp          R@ =>" LOCAL-DT"        \ local date and time in ISO format

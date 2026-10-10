@@ -15,6 +15,7 @@ s" Takahashi Epsilon 160-ED" $-> rig.telescope
 530 -> rig.focal_len
 
 s" Patrick Moore" $-> obs.observer
+s" Gaia DR3 2781184739422799232" $-> obs.target
 3 -> obs.type
 
 CR

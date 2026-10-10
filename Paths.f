@@ -32,6 +32,7 @@ FILEPATH_SIZE allocate-buffer constant FITSfilepath
     s" working" filepath-buffer append-path
     stream-addr stream-u filepath-buffer append-path
     s" UUID" frame FRAME_METADATA @ >string filepath-buffer append-path
+    filepath-buffer buffer-punctuate-filepath
     filename-addr filename-u filepath-buffer append-path
     suffix-addr suffix-u filepath-buffer write-buffer
         abort" Filepath buffer full"
@@ -46,6 +47,7 @@ FILEPATH_SIZE allocate-buffer constant FITSfilepath
     astro.root filepath-buffer write-buffer drop
     s" working" filepath-buffer append-path
     stream-addr stream-u filepath-buffer append-path
+    filepath-buffer buffer-punctuate-filepath
     filename-addr filename-u filepath-buffer append-path
     suffix-addr suffix-u filepath-buffer write-buffer
         abort" Filepath buffer full"

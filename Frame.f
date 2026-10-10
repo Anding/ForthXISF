@@ -88,7 +88,15 @@ s" " $value FITSstringBuf
     over c@ ''' = if 2 - swap 1 + swap then
 ;
 
+: valid-filepath-folder? { filepath-buffer | folder-u -- flag }
+\ Require a drive prefix and a recorded folder wholly inside the used buffer.
+    filepath-buffer BUFFER_LEN_DIR @ -> folder-u
+    folder-u 3 >=
+    folder-u filepath-buffer buffer_used <= and
+;
+
 : create-imageDirectory ( filepath-buffer -- )
+    dup valid-filepath-folder? 0= abort" Filepath folder not punctuated"
     >R
     R@ buffer-drive-to-string R> buffer-dir-to-string makeDirLevels abort" cannot create image directory"
 ;

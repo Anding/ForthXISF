@@ -2,11 +2,22 @@ NEED ForthAstroFormats
 NEED simple-tester
 
 16 8 1 allocate-frame constant test-frame
+FILEPATH_SIZE allocate-buffer constant test-filepath
 
 Tstart
 
 T{ test-frame FRAME_METADATA @ ordered-map? }T -1 ==
 T{ test-frame FRAME_STATISTICS @ }T 0 ==
+
+test-filepath reset-buffer
+s" E:\images\tests\invalid\artifact.dat" test-filepath write-buffer drop
+T{ test-filepath valid-filepath-folder? }T 0 ==
+
+test-filepath reset-buffer
+s" E:\images\tests\valid\" test-filepath write-buffer drop
+test-filepath buffer-punctuate-filepath
+s" artifact.dat" test-filepath write-buffer drop
+T{ test-filepath valid-filepath-folder? }T -1 ==
 
 s" first" test-frame FRAME_METADATA @ =>" FIRST"
 s" second" test-frame FRAME_METADATA @ =>" SECOND"
@@ -22,4 +33,5 @@ T{ s" FRESH" test-frame FRAME_METADATA @ >string hashS }T
 Tend
 
 test-frame free-frame
+test-filepath free-buffer
 bye

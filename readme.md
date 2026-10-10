@@ -69,6 +69,10 @@ buffer, extension, and file I/O. Defaults are assigned when the formats
 library loads, so ordinary orchestration only invokes the zero-argument
 writers:
 
+Complete-path composers must call `buffer-punctuate-filepath` after the
+folder and before the filename. Directory creation rejects buffers without
+that recorded boundary rather than passing an invalid length to Windows.
+
 ```forth
 save-XISFimage
 save-FITSimage

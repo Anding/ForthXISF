@@ -38,17 +38,20 @@ NEED ForthAtomicFile
     s\" \"\r\n" fileid write-file abort" Cannot write manifest"
 ;
 
-: replace-file-atomically { source-buffer destination-buffer -- }
+: replace-file-atomically
+    { source-buffer destination-buffer | replaced? -- }
 \ Replace a visible publication only after its temporary file is complete.
     0 source-buffer echo-buffer abort" Publication source path buffer full"
     0 destination-buffer echo-buffer abort" Publication destination path buffer full"
     10 0 do
         source-buffer buffer-to-string drop
         destination-buffer buffer-to-string drop
-        ReplaceFileAtomic 0= if unloop exit then
+        ReplaceFileAtomic 0= if -1 -> replaced? leave then
         100 ms
     loop
-    abort" Cannot replace publication manifest"
+    source-buffer backspace-buffer abort" Cannot restore publication source path"
+    destination-buffer backspace-buffer abort" Cannot restore publication destination path"
+    replaced? 0= abort" Cannot replace publication manifest"
 ;
 
 : save-binary-file-to

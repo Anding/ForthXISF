@@ -36,9 +36,10 @@ the explicit low-level form. Both write the ordered FITS map as UTF-8
 `key<TAB>value<CRLF>` lines through an in-memory buffer.
 
 `replace-file-atomically` expects ForthBase buffer descriptors containing
-source and destination paths. It appends the required NUL terminators and
-uses the native `ReplaceFileAtomic` export, which replaces the destination
-only after a completed temporary manifest exists.
+source and destination paths. It temporarily appends the required NUL
+terminators, calls the native `ReplaceFileAtomic` export, and restores the
+retained paths before returning. Replacement exposes the destination only
+after a completed temporary manifest exists.
 
 ## Output pathname policy
 

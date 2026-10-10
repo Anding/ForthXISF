@@ -61,7 +61,8 @@ ASSIGN no-solver TO-DO solve-image
     s" ," $+> solver.alignment-command
     solver.~Dec$ $+> solver.alignment-command
     s" ," $+> solver.alignment-command
-    pierside-addr pierside-u $+> solver.alignment-command
+    pierside-addr pierside-u 0> if 1 else 0 then
+        $+> solver.alignment-command
     s" ," $+> solver.alignment-command
     solved-ra solved-dec night-of JNOW swap
     solver.~RA$ $+> solver.alignment-command

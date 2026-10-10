@@ -20,8 +20,10 @@ T{ s" 10UALPT" solver.test-metadata >string s\" s\" " search nip nip }T -1 ==
 T{ s" 10UALPT" solver.test-metadata >string
    s" add-alignment-point" search nip nip
 }T -1 ==
+T{ s" 10UALPT" solver.test-metadata >string
+   s" ,E," search nip nip
+}T -1 ==
 
 Tend
 
 solver.test-frame free-frame
-bye
